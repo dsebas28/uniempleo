@@ -57,8 +57,8 @@ export default function StudentDashboard() {
       {/* Welcome */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Outfit' }}>
-            Hola, {(user?.profile?.fullName || user?.profile?.name || user?.email?.split('@')[0] || 'Estudiante').split(' ')[0]} 👋
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white" style={{ fontFamily: 'Plus Jakarta Sans' }}>
+            Hola, {(user?.profile?.full_name || user?.fullName || user?.email?.split('@')[0] || 'Estudiante').split(' ')[0]} 👋
           </h1>
           <p className="text-slate-500 text-sm mt-0.5">Aquí tienes un resumen de tu actividad en UniEmpleo.</p>
         </div>

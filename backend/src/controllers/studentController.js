@@ -75,6 +75,42 @@ function unsaveJob(req, res) {
   }
 }
 
+function getJobAlerts(req, res) {
+  try {
+    const alerts = studentService.getJobAlerts(req.user.id);
+    res.json(alerts);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+}
+
+function createJobAlert(req, res) {
+  try {
+    const result = studentService.createJobAlert(req.user.id, req.body);
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+}
+
+function toggleJobAlert(req, res) {
+  try {
+    const result = studentService.toggleJobAlert(req.user.id, req.params.id, req.body.active);
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+}
+
+function deleteJobAlert(req, res) {
+  try {
+    const result = studentService.deleteJobAlert(req.user.id, req.params.id);
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+}
+
 function uploadResume(req, res) {
   try {
     if (!req.file) {
@@ -207,6 +243,10 @@ module.exports = {
   getSavedJobs,
   saveJob,
   unsaveJob,
+  getJobAlerts,
+  createJobAlert,
+  toggleJobAlert,
+  deleteJobAlert,
   uploadResume,
   deleteResume,
   addEducation,

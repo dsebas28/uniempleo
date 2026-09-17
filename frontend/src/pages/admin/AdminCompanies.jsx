@@ -72,7 +72,7 @@ export default function AdminCompanies() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
-            <Building2 className="w-7 h-7 text-indigo-600" />
+            <Building2 className="w-7 h-7 text-brand-600" />
             Validación y Gestión de Empresas
           </h1>
           <p className="text-sm text-slate-500 mt-1">
@@ -101,7 +101,7 @@ export default function AdminCompanies() {
             placeholder="Buscar por nombre de empresa, sector o ciudad..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+            className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
           />
         </div>
 
@@ -116,7 +116,7 @@ export default function AdminCompanies() {
               onClick={() => setStatusFilter(tab.id)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                 statusFilter === tab.id
-                  ? 'bg-indigo-600 text-white shadow-xs'
+                  ? 'bg-brand-600 text-white shadow-xs'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
@@ -129,7 +129,7 @@ export default function AdminCompanies() {
       {/* Companies Table */}
       {loading ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-16 flex flex-col items-center justify-center">
-          <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mb-3" />
+          <Loader2 className="w-8 h-8 text-brand-600 animate-spin mb-3" />
           <p className="text-sm text-slate-500 font-medium">Cargando directorio de empresas...</p>
         </div>
       ) : filteredCompanies.length === 0 ? (
@@ -139,7 +139,7 @@ export default function AdminCompanies() {
           <p className="text-xs text-slate-500 mt-1">No se encontraron resultados para los filtros actuales.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+        <div className="bg-white dark:bg-white/[0.04] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -168,14 +168,14 @@ export default function AdminCompanies() {
                           <div className="font-semibold text-slate-900 flex items-center gap-1.5">
                             {c.name}
                             {c.website && (
-                              <a href={c.website} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-indigo-600">
+                              <a href={c.website} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-brand-600">
                                 <ExternalLink className="w-3 h-3" />
                               </a>
                             )}
                           </div>
                           <button
                             onClick={() => setSelectedCompany(c)}
-                            className="text-[11px] text-indigo-600 hover:underline flex items-center gap-0.5 mt-0.5"
+                            className="text-[11px] text-brand-600 hover:underline flex items-center gap-0.5 mt-0.5"
                           >
                             Ver expediente
                           </button>
@@ -260,7 +260,7 @@ export default function AdminCompanies() {
           <div className="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-100">
             <div className="p-6 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center font-bold text-indigo-700 text-lg">
+                <div className="w-12 h-12 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center font-bold text-brand-700 text-lg">
                   {selectedCompany.name?.[0] || 'E'}
                 </div>
                 <div>

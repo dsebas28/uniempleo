@@ -29,6 +29,7 @@ import StudentProfile from './pages/student/Profile';
 import CVPreview from './pages/student/CVPreview';
 import StudentApplications from './pages/student/Applications';
 import StudentSaved from './pages/student/Saved';
+import StudentJobAlerts from './pages/student/JobAlerts';
 import StudentNotifications from './pages/student/Notifications';
 import InterviewPrep from './pages/student/InterviewPrep';
 
@@ -45,6 +46,7 @@ import AdminUsers from './pages/admin/AdminUsers';
 import AdminCompanies from './pages/admin/AdminCompanies';
 import AdminJobs from './pages/admin/AdminJobs';
 import AdminReports from './pages/admin/AdminReports';
+import AdminEmailOutbox from './pages/admin/AdminEmailOutbox';
 
 export default function App() {
   const { isAuthenticated, user } = useAuth();
@@ -80,6 +82,7 @@ export default function App() {
         <Route path="/perfil" element={<StudentProfile />} />
         <Route path="/postulaciones" element={<StudentApplications />} />
         <Route path="/favoritos" element={<StudentSaved />} />
+        <Route path="/alertas-empleo" element={<StudentJobAlerts />} />
         <Route path="/notificaciones" element={<StudentNotifications />} />
         <Route path="/preparacion" element={<InterviewPrep />} />
       </Route>
@@ -115,6 +118,7 @@ export default function App() {
         <Route path="/admin/empresas" element={<AdminCompanies />} />
         <Route path="/admin/vacantes" element={<AdminJobs />} />
         <Route path="/admin/reportes" element={<AdminReports />} />
+        <Route path="/admin/alertas-email" element={<AdminEmailOutbox />} />
       </Route>
 
       {/* Fallback */}

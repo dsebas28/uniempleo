@@ -8,15 +8,18 @@ import { useAuth } from '../../context/AuthContext';
 import Logo from '../../components/Logo';
 import toast from 'react-hot-toast';
 
+const REMEMBER_KEY = 'uniempleo_remember_admin_email';
+
 export default function LoginAdmin() {
   const { login, logout, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname;
 
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(() => localStorage.getItem(REMEMBER_KEY) || '');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [remember, setRemember] = useState(() => !!localStorage.getItem(REMEMBER_KEY));
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState('');
 
@@ -48,6 +51,9 @@ export default function LoginAdmin() {
       setServerError('Esta cuenta no tiene permisos de administrador.');
       return;
     }
+
+    if (remember) localStorage.setItem(REMEMBER_KEY, email.trim());
+    else localStorage.removeItem(REMEMBER_KEY);
 
     toast.success('Acceso concedido al panel de control');
     navigate(from && from !== '/login' ? from : '/admin', { replace: true });
@@ -85,7 +91,7 @@ export default function LoginAdmin() {
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-600 to-brand-900 text-white flex items-center justify-center shadow-lg shadow-brand-900/40 mx-auto mb-4 ring-4 ring-brand-500/10">
               <ShieldCheck className="w-7 h-7" />
             </div>
-            <h1 className="text-xl font-bold text-white tracking-tight" style={{ fontFamily: 'Outfit' }}>
+            <h1 className="text-xl font-bold text-white tracking-tight" style={{ fontFamily: 'Plus Jakarta Sans' }}>
               Panel de Control
             </h1>
             <p className="text-xs text-slate-400 mt-1.5 flex items-center justify-center gap-1.5">
@@ -151,6 +157,17 @@ export default function LoginAdmin() {
               </div>
               {errors.password && <p className="text-xs text-rose-400 mt-1.5 font-medium">{errors.password}</p>}
             </div>
+
+            <label htmlFor="remember" className="flex items-center gap-2.5 cursor-pointer select-none">
+              <input
+                id="remember"
+                type="checkbox"
+                checked={remember}
+                onChange={(e) => setRemember(e.target.checked)}
+                className="w-4 h-4 rounded border-slate-600 bg-slate-800/60 text-brand-500 focus:ring-2 focus:ring-brand-500/30 cursor-pointer"
+              />
+              <span className="text-xs font-medium text-slate-400">Recordar mi correo en este dispositivo</span>
+            </label>
 
             <button
               type="submit"

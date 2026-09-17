@@ -5,9 +5,10 @@ import { jobsAPI } from '../services/api';
 import JobCard from '../components/JobCard';
 import { JobCardSkeleton } from '../components/LoadingSkeleton';
 import EmptyState from '../components/EmptyState';
+import { COLOMBIA_CITIES } from '../data/colombia';
 
 const CAREERS = ['Todas las carreras', 'Ingeniería de Sistemas', 'Administración de Empresas', 'Contaduría Pública', 'Diseño Gráfico', 'Ingeniería Industrial', 'Psicología', 'Comunicación Social', 'Economía', 'Marketing'];
-const CITIES = ['Todas las ciudades', 'Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Bucaramanga', 'Pereira'];
+const CITIES = ['Todas las ciudades', ...COLOMBIA_CITIES];
 const DURATIONS = ['Cualquier duración', '3 meses', '6 meses', '12 meses'];
 
 export default function Internships() {

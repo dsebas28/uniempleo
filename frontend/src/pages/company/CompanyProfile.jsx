@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { Linkedin, Instagram } from '../../components/SocialIcons';
 import { companyAPI } from '../../services/api';
+import { COLOMBIA_CITIES } from '../../data/colombia';
 import toast from 'react-hot-toast';
 
 export default function CompanyProfile() {
@@ -80,7 +81,7 @@ export default function CompanyProfile() {
   if (loading) {
     return (
       <div className="bg-white rounded-2xl border border-slate-200 p-12 flex flex-col items-center justify-center">
-        <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mb-3" />
+        <Loader2 className="w-8 h-8 text-brand-600 animate-spin mb-3" />
         <p className="text-sm text-slate-500 font-medium">Cargando datos de tu empresa...</p>
       </div>
     );
@@ -92,7 +93,7 @@ export default function CompanyProfile() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
-            <Building2 className="w-7 h-7 text-indigo-600" />
+            <Building2 className="w-7 h-7 text-brand-600" />
             Perfil Corporativo
           </h1>
           <p className="text-sm text-slate-500 mt-1">
@@ -116,10 +117,10 @@ export default function CompanyProfile() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information Card */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 md:p-8 space-y-6">
+        <div className="bg-white dark:bg-white/[0.04] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs p-6 md:p-8 space-y-6">
           <div className="border-b border-slate-100 pb-4">
             <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-indigo-600" />
+              <Briefcase className="w-5 h-5 text-brand-600" />
               Información General
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
@@ -139,7 +140,7 @@ export default function CompanyProfile() {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Ej. InnovaTech Solutions S.A.S"
-                className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
               />
             </div>
 
@@ -154,7 +155,7 @@ export default function CompanyProfile() {
                 value={formData.sector}
                 onChange={handleChange}
                 placeholder="Ej. Tecnología, Finanzas, Salud, Consultoría..."
-                className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
               />
             </div>
 
@@ -163,16 +164,17 @@ export default function CompanyProfile() {
                 Ciudad Sede Principal *
               </label>
               <div className="relative">
-                <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
+                <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+                <select
                   name="city"
                   required
                   value={formData.city}
                   onChange={handleChange}
-                  placeholder="Ej. Bogotá D.C., Medellín, Cali..."
-                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
-                />
+                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
+                >
+                  <option value="">Seleccionar ciudad</option>
+                  {COLOMBIA_CITIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
               </div>
             </div>
 
@@ -188,7 +190,7 @@ export default function CompanyProfile() {
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="+57 300 123 4567"
-                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                 />
               </div>
             </div>
@@ -215,17 +217,17 @@ export default function CompanyProfile() {
                 value={formData.logo}
                 onChange={handleChange}
                 placeholder="https://..."
-                className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
               />
             </div>
           </div>
         </div>
 
         {/* Culture and Description Card */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 md:p-8 space-y-6">
+        <div className="bg-white dark:bg-white/[0.04] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs p-6 md:p-8 space-y-6">
           <div className="border-b border-slate-100 pb-4">
             <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-indigo-600" />
+              <Sparkles className="w-5 h-5 text-brand-600" />
               Descripción y Propósito
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
@@ -245,7 +247,7 @@ export default function CompanyProfile() {
                 value={formData.description}
                 onChange={handleChange}
                 placeholder="Cuenta qué hace la empresa, sus proyectos más destacados y qué oportunidad representa para el talento joven..."
-                className="w-full px-4 py-3 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all leading-relaxed"
+                className="w-full px-4 py-3 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all leading-relaxed"
               />
             </div>
 
@@ -259,17 +261,17 @@ export default function CompanyProfile() {
                 value={formData.mission}
                 onChange={handleChange}
                 placeholder="¿Por qué un universitario debería iniciar su carrera profesional aquí? Cuáles son los aprendizajes clave..."
-                className="w-full px-4 py-3 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all leading-relaxed"
+                className="w-full px-4 py-3 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all leading-relaxed"
               />
             </div>
           </div>
         </div>
 
         {/* Online Presence & Social Links */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 md:p-8 space-y-6">
+        <div className="bg-white dark:bg-white/[0.04] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs p-6 md:p-8 space-y-6">
           <div className="border-b border-slate-100 pb-4">
             <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <Globe className="w-5 h-5 text-indigo-600" />
+              <Globe className="w-5 h-5 text-brand-600" />
               Presencia Web y Redes
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
@@ -290,7 +292,7 @@ export default function CompanyProfile() {
                   value={formData.website}
                   onChange={handleChange}
                   placeholder="https://tuempresa.com"
-                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                 />
               </div>
             </div>
@@ -307,7 +309,7 @@ export default function CompanyProfile() {
                   value={formData.linkedin}
                   onChange={handleChange}
                   placeholder="https://linkedin.com/company/..."
-                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                 />
               </div>
             </div>
@@ -324,7 +326,7 @@ export default function CompanyProfile() {
                   value={formData.instagram}
                   onChange={handleChange}
                   placeholder="@tuempresa"
-                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                 />
               </div>
             </div>
@@ -336,7 +338,7 @@ export default function CompanyProfile() {
           <button
             type="submit"
             disabled={saving}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-semibold rounded-xl shadow-md transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white text-sm font-semibold rounded-xl shadow-md transition-all cursor-pointer"
           >
             {saving ? (
               <>

@@ -78,7 +78,7 @@ export default function AdminJobs() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
-            <Briefcase className="w-7 h-7 text-indigo-600" />
+            <Briefcase className="w-7 h-7 text-brand-600" />
             Moderación de Vacantes y Empleos
           </h1>
           <p className="text-sm text-slate-500 mt-1">
@@ -86,7 +86,7 @@ export default function AdminJobs() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 bg-indigo-50 border border-indigo-100 px-4 py-2 rounded-xl text-xs font-semibold text-indigo-700">
+        <div className="flex items-center gap-2 bg-brand-50 border border-brand-100 px-4 py-2 rounded-xl text-xs font-semibold text-brand-700">
           <span>{jobs.length} Ofertas Registradas</span>
         </div>
       </div>
@@ -100,7 +100,7 @@ export default function AdminJobs() {
             placeholder="Buscar por cargo, empresa, área o ciudad..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+            className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
           />
         </div>
 
@@ -116,7 +116,7 @@ export default function AdminJobs() {
               onClick={() => setStatusFilter(tab.id)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                 statusFilter === tab.id
-                  ? 'bg-indigo-600 text-white shadow-xs'
+                  ? 'bg-brand-600 text-white shadow-xs'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
@@ -129,7 +129,7 @@ export default function AdminJobs() {
       {/* Jobs Table */}
       {loading ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-16 flex flex-col items-center justify-center">
-          <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mb-3" />
+          <Loader2 className="w-8 h-8 text-brand-600 animate-spin mb-3" />
           <p className="text-sm text-slate-500 font-medium">Cargando ofertas de trabajo...</p>
         </div>
       ) : filteredJobs.length === 0 ? (
@@ -139,7 +139,7 @@ export default function AdminJobs() {
           <p className="text-xs text-slate-500 mt-1">Prueba con otros términos de búsqueda.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+        <div className="bg-white dark:bg-white/[0.04] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -160,7 +160,7 @@ export default function AdminJobs() {
                       <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
                         <span>{j.contract_type || 'Prácticas'}</span>
                         {j.is_internship ? (
-                          <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.2 rounded">Práctica</span>
+                          <span className="text-[10px] font-bold text-brand-600 bg-brand-50 px-1.5 py-0.2 rounded">Práctica</span>
                         ) : null}
                       </div>
                     </td>
@@ -197,7 +197,7 @@ export default function AdminJobs() {
                         <Link
                           to={`/empleos/${j.id}`}
                           target="_blank"
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-slate-100 transition-colors"
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-brand-600 hover:bg-slate-100 transition-colors"
                           title="Ver vacante pública"
                         >
                           <ExternalLink className="w-4 h-4" />
@@ -207,7 +207,7 @@ export default function AdminJobs() {
                           disabled={updatingId === j.id}
                           value={j.status}
                           onChange={(e) => handleStatusChange(j.id, e.target.value)}
-                          className="text-xs font-semibold px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer text-slate-700"
+                          className="text-xs font-semibold px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-500 cursor-pointer text-slate-700"
                         >
                           <option value="active">Activa</option>
                           <option value="paused">Pausada</option>

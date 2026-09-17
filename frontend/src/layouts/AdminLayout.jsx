@@ -1,9 +1,10 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import Logo from '../components/Logo';
 import {
-  LayoutDashboard, Users, Building2, Briefcase, BarChart2,
-  GraduationCap, LogOut, Menu, X, ChevronRight, Shield
+  LayoutDashboard, Users, Building2, Briefcase, BarChart2, Mail,
+  LogOut, Menu, X, ChevronRight, Shield
 } from 'lucide-react';
 
 const navItems = [
@@ -11,9 +12,13 @@ const navItems = [
   { to: '/admin/usuarios', icon: Users, label: 'Usuarios' },
   { to: '/admin/empresas', icon: Building2, label: 'Empresas' },
   { to: '/admin/vacantes', icon: Briefcase, label: 'Vacantes' },
+  { to: '/admin/alertas-email', icon: Mail, label: 'Alertas de empleo' },
   { to: '/admin/reportes', icon: BarChart2, label: 'Reportes' },
 ];
 
+// Panel de Administración: acento "gris pizarra" (permanentemente oscuro,
+// deliberadamente sobrio/seguro) — no usa el índigo de Estudiante ni el
+// esmeralda de Empresa, para que el rol se distinga a simple vista.
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
@@ -23,8 +28,8 @@ export default function AdminLayout() {
   const handleLogout = () => { logout(); navigate('/'); };
   const isActive = (path) => location.pathname === path;
 
-  // Admin profile name — can be in profile or directly on user
-  const adminName = user?.profile?.fullName || user?.email?.split('@')[0] || 'Administrador';
+  // El backend anida el perfil de admin bajo `profile` (columna `full_name`).
+  const adminName = user?.profile?.full_name || user?.fullName || user?.email?.split('@')[0] || 'Administrador';
   const adminEmail = user?.email || '';
 
   const SidebarContent = () => (
@@ -32,12 +37,7 @@ export default function AdminLayout() {
       {/* Logo */}
       <div className="px-5 py-4 border-b border-slate-800">
         <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-200">
-            <GraduationCap size={16} className="text-white" />
-          </div>
-          <span className="font-black text-lg tracking-tight" style={{ fontFamily: 'Outfit' }}>
-            <span className="text-blue-400">Uni</span><span className="text-white">Empleo</span>
-          </span>
+          <Logo size={30} variant="light" className="group-hover:opacity-90 transition-opacity" />
         </Link>
       </div>
 
@@ -45,8 +45,8 @@ export default function AdminLayout() {
       <div className="px-3 py-3">
         <div className="px-3.5 py-3 rounded-2xl bg-slate-800 border border-slate-700">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-blue-600/30 border border-blue-500/30 flex items-center justify-center flex-shrink-0">
-              <Shield size={17} className="text-blue-400" />
+            <div className="w-9 h-9 rounded-xl bg-slate-700 border border-slate-600 flex items-center justify-center flex-shrink-0">
+              <Shield size={17} className="text-slate-300" />
             </div>
             <div className="min-w-0">
               <p className="font-semibold text-white text-sm truncate leading-tight">{adminName}</p>
@@ -71,7 +71,7 @@ export default function AdminLayout() {
               onClick={() => setSidebarOpen(false)}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium mb-0.5 transition-all duration-150 ${
                 active
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-900/50'
+                  ? 'bg-slate-700 text-white shadow-md shadow-black/30'
                   : 'text-slate-400 hover:bg-slate-800 hover:text-white'
               }`}
             >
@@ -87,7 +87,7 @@ export default function AdminLayout() {
       <div className="p-3 border-t border-slate-800 mt-auto">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-950/40 hover:text-red-300 transition-colors duration-150"
+          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-rose-400 hover:bg-rose-950/40 hover:text-rose-300 transition-colors duration-150"
         >
           <LogOut size={16} /> Cerrar sesión
         </button>
@@ -118,7 +118,7 @@ export default function AdminLayout() {
           <button className="p-2 rounded-lg text-slate-400 hover:bg-slate-800" onClick={() => setSidebarOpen(true)}>
             <Menu size={19} />
           </button>
-          <span className="font-bold text-white" style={{ fontFamily: 'Outfit' }}>Panel Admin</span>
+          <span className="font-display font-bold text-white">Panel Admin</span>
         </div>
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-7xl mx-auto p-4 sm:p-6">

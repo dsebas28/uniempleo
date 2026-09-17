@@ -3,6 +3,7 @@ const companyModel = require('../models/companyModel');
 const jobModel = require('../models/jobModel');
 const applicationModel = require('../models/applicationModel');
 const courseModel = require('../models/courseModel');
+const emailLogModel = require('../models/emailLogModel');
 const { getDb } = require('../database/db');
 
 const adminService = {
@@ -67,6 +68,10 @@ const adminService = {
     const userGrowth = db.prepare(`SELECT strftime('%Y-%m', created_at) as month, role, COUNT(*) as count FROM users GROUP BY month, role ORDER BY month`).all();
 
     return { jobsByArea, jobsByCity, jobsByModality, appsByStatus, coursesByArea, userGrowth };
+  },
+
+  getEmailLog() {
+    return { emails: emailLogModel.getAll(), total: emailLogModel.countAll() };
   }
 };
 

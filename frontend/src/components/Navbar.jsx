@@ -3,15 +3,17 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import {
   Briefcase, Bell, User, Menu, X, ChevronDown,
-  LogOut, LayoutDashboard, Heart, FileText
+  LogOut, LayoutDashboard, Heart, FileText, Sun, Moon
 } from 'lucide-react';
 import { notificationsAPI } from '../services/api';
 import Logo from './Logo';
+import { useTheme } from '../hooks/useTheme';
 
 export default function Navbar() {
   const { isAuthenticated, user, logout, isStudent, isCompany, isAdmin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { isDark, toggleTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -58,7 +60,9 @@ export default function Navbar() {
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      scrolled || mobileOpen ? 'bg-white shadow-lg border-b border-slate-200' : 'bg-white/95 backdrop-blur-md border-b border-slate-100'
+      scrolled || mobileOpen
+        ? 'bg-white dark:bg-brand-950 shadow-lg border-b border-slate-200 dark:border-white/10'
+        : 'bg-white/95 dark:bg-brand-950/90 backdrop-blur-md border-b border-slate-100 dark:border-white/5'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -75,8 +79,8 @@ export default function Navbar() {
                 to={link.to}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   isActive(link.to)
-                    ? 'bg-brand-50 text-brand-700 font-semibold'
-                    : 'text-slate-600 hover:text-brand-700 hover:bg-slate-50'
+                    ? 'bg-brand-50 dark:bg-white/10 text-brand-700 dark:text-brand-200 font-semibold'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-brand-700 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5'
                 }`}
               >
                 {link.label}
@@ -85,18 +89,26 @@ export default function Navbar() {
           </div>
 
           {/* Right side */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2">
+            <button
+              onClick={toggleTheme}
+              aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+              className="p-2 rounded-lg text-slate-500 dark:text-slate-300 hover:text-brand-700 dark:hover:text-white hover:bg-brand-50 dark:hover:bg-white/10 transition-colors"
+            >
+              {isDark ? <Sun size={19} /> : <Moon size={19} />}
+            </button>
+
             {isAuthenticated ? (
               <>
                 {/* Notifications */}
                 {!isAdmin && (
                   <Link
                     to={isCompany ? '/empresa/dashboard' : '/notificaciones'}
-                    className="relative p-2 rounded-lg text-slate-500 hover:text-brand-700 hover:bg-brand-50 transition-colors"
+                    className="relative p-2 rounded-lg text-slate-500 dark:text-slate-300 hover:text-brand-700 dark:hover:text-white hover:bg-brand-50 dark:hover:bg-white/10 transition-colors"
                   >
                     <Bell size={20} />
                     {notifCount > 0 && (
-                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent-500 text-brand-900 text-xs font-bold rounded-full flex items-center justify-center notif-dot">
+                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent-500 text-brand-950 text-xs font-bold rounded-full flex items-center justify-center notif-dot">
                         {notifCount > 9 ? '9+' : notifCount}
                       </span>
                     )}
@@ -107,56 +119,56 @@ export default function Navbar() {
                 <div className="relative">
                   <button
                     onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-white/10 transition-colors"
                   >
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-600 to-brand-900 flex items-center justify-center text-white text-sm font-bold">
-                      {(user?.fullName || user?.companyName || 'A')?.charAt(0)?.toUpperCase()}
+                      {(user?.profile?.full_name || user?.fullName || user?.profile?.name || user?.companyName || 'A')?.charAt(0)?.toUpperCase()}
                     </div>
-                    <span className="text-sm font-medium text-slate-700 max-w-[120px] truncate">
-                      {user?.fullName || user?.companyName || 'Admin'}
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-200 max-w-[120px] truncate">
+                      {user?.profile?.full_name || user?.fullName || user?.profile?.name || user?.companyName || 'Admin'}
                     </span>
                     <ChevronDown size={14} className={`text-slate-400 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   {dropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-100 py-2 animate-fade-in">
-                      <div className="px-4 py-2 border-b border-slate-50">
-                        <p className="text-xs text-slate-400 font-medium uppercase tracking-wide">
+                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-brand-950 rounded-xl shadow-xl border border-slate-100 dark:border-white/10 py-2 animate-fade-in">
+                      <div className="px-4 py-2 border-b border-slate-50 dark:border-white/10">
+                        <p className="text-xs text-slate-400 dark:text-slate-400 font-medium uppercase tracking-wide">
                           {isStudent ? 'Estudiante' : isCompany ? 'Empresa' : 'Administrador'}
                         </p>
-                        <p className="text-sm font-semibold text-slate-800 truncate">
-                          {user?.fullName || user?.companyName || 'Admin'}
+                        <p className="text-sm font-semibold text-slate-800 dark:text-white truncate">
+                          {user?.profile?.full_name || user?.fullName || user?.profile?.name || user?.companyName || 'Admin'}
                         </p>
                       </div>
-                      <Link to={getDashboardLink()} className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-brand-50 hover:text-brand-700 transition-colors">
+                      <Link to={getDashboardLink()} className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-brand-50 dark:hover:bg-white/10 hover:text-brand-700 dark:hover:text-white transition-colors">
                         <LayoutDashboard size={16} /> Dashboard
                       </Link>
                       {isStudent && (
                         <>
-                          <Link to="/perfil" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-brand-50 hover:text-brand-700 transition-colors">
+                          <Link to="/perfil" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-brand-50 dark:hover:bg-white/10 hover:text-brand-700 dark:hover:text-white transition-colors">
                             <User size={16} /> Mi perfil
                           </Link>
-                          <Link to="/postulaciones" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-brand-50 hover:text-brand-700 transition-colors">
+                          <Link to="/postulaciones" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-brand-50 dark:hover:bg-white/10 hover:text-brand-700 dark:hover:text-white transition-colors">
                             <FileText size={16} /> Postulaciones
                           </Link>
-                          <Link to="/favoritos" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-brand-50 hover:text-brand-700 transition-colors">
+                          <Link to="/favoritos" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-brand-50 dark:hover:bg-white/10 hover:text-brand-700 dark:hover:text-white transition-colors">
                             <Heart size={16} /> Favoritos
                           </Link>
                         </>
                       )}
                       {isCompany && (
                         <>
-                          <Link to="/empresa/vacantes" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-brand-50 hover:text-brand-700 transition-colors">
+                          <Link to="/empresa/vacantes" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-brand-50 dark:hover:bg-white/10 hover:text-brand-700 dark:hover:text-white transition-colors">
                             <Briefcase size={16} /> Mis vacantes
                           </Link>
-                          <Link to="/empresa/candidatos" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-brand-50 hover:text-brand-700 transition-colors">
+                          <Link to="/empresa/candidatos" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-brand-50 dark:hover:bg-white/10 hover:text-brand-700 dark:hover:text-white transition-colors">
                             <User size={16} /> Candidatos
                           </Link>
                         </>
                       )}
                       <button
                         onClick={handleLogout}
-                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors mt-1 border-t border-slate-50"
+                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors mt-1 border-t border-slate-50 dark:border-white/10"
                       >
                         <LogOut size={16} /> Cerrar sesión
                       </button>
@@ -166,7 +178,7 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Link to="/login" className="px-4 py-2 text-sm font-semibold text-brand-800 hover:text-brand-900 transition-colors">
+                <Link to="/login" className="px-4 py-2 text-sm font-semibold text-brand-800 dark:text-brand-200 hover:text-brand-900 dark:hover:text-white transition-colors">
                   Iniciar sesión
                 </Link>
                 <Link to="/registro" className="px-5 py-2 text-sm font-bold rounded-lg btn-accent shadow-md">
@@ -176,58 +188,67 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
-            onClick={() => setMobileOpen(!mobileOpen)}
-          >
-            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
+          {/* Mobile: theme toggle + menu button */}
+          <div className="md:hidden flex items-center gap-1">
+            <button
+              onClick={toggleTheme}
+              aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+              className="p-2 rounded-lg text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+            >
+              {isDark ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+            <button
+              className="p-2 rounded-lg text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+              onClick={() => setMobileOpen(!mobileOpen)}
+            >
+              {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-slate-100 bg-white animate-fade-in">
+        <div className="md:hidden border-t border-slate-100 dark:border-white/10 bg-white dark:bg-brand-950 animate-fade-in">
           <div className="px-4 py-3 space-y-1">
             {navLinks.map(link => (
               <Link
                 key={link.to}
                 to={link.to}
                 className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                  isActive(link.to) ? 'bg-brand-50 text-brand-700' : 'text-slate-700 hover:bg-slate-50'
+                  isActive(link.to) ? 'bg-brand-50 dark:bg-white/10 text-brand-700 dark:text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5'
                 }`}
               >
                 {link.label}
               </Link>
             ))}
           </div>
-          <div className="px-4 pb-4 border-t border-slate-100 pt-3">
+          <div className="px-4 pb-4 border-t border-slate-100 dark:border-white/10 pt-3">
             {isAuthenticated ? (
               <div className="space-y-1">
-                <Link to={getDashboardLink()} className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-slate-700 hover:bg-brand-50 transition-colors">
+                <Link to={getDashboardLink()} className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-slate-700 dark:text-slate-200 hover:bg-brand-50 dark:hover:bg-white/10 transition-colors">
                   <LayoutDashboard size={16} /> Dashboard
                 </Link>
                 {isStudent && (
                   <>
-                    <Link to="/perfil" className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-slate-700 hover:bg-brand-50 transition-colors">
+                    <Link to="/perfil" className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-slate-700 dark:text-slate-200 hover:bg-brand-50 dark:hover:bg-white/10 transition-colors">
                       <User size={16} /> Mi perfil
                     </Link>
-                    <Link to="/notificaciones" className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-slate-700 hover:bg-brand-50 transition-colors">
-                      <Bell size={16} /> Notificaciones {notifCount > 0 && <span className="ml-auto bg-accent-500 text-brand-900 text-xs px-1.5 py-0.5 rounded-full">{notifCount}</span>}
+                    <Link to="/notificaciones" className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-slate-700 dark:text-slate-200 hover:bg-brand-50 dark:hover:bg-white/10 transition-colors">
+                      <Bell size={16} /> Notificaciones {notifCount > 0 && <span className="ml-auto bg-accent-500 text-brand-950 text-xs px-1.5 py-0.5 rounded-full">{notifCount}</span>}
                     </Link>
                   </>
                 )}
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                 >
                   <LogOut size={16} /> Cerrar sesión
                 </button>
               </div>
             ) : (
               <div className="flex flex-col gap-2">
-                <Link to="/login" className="block text-center px-4 py-3 rounded-lg text-sm font-semibold border border-slate-200 text-brand-800 hover:bg-slate-50">
+                <Link to="/login" className="block text-center px-4 py-3 rounded-lg text-sm font-semibold border border-slate-200 dark:border-white/15 text-brand-800 dark:text-white hover:bg-slate-50 dark:hover:bg-white/10">
                   Iniciar sesión
                 </Link>
                 <Link to="/registro" className="block text-center px-4 py-3 rounded-lg text-sm font-bold btn-accent">

@@ -8,15 +8,18 @@ import { useAuth } from '../../context/AuthContext';
 import Logo, { LogoMark } from '../../components/Logo';
 import toast from 'react-hot-toast';
 
+const REMEMBER_KEY = 'uniempleo_remember_student_email';
+
 export default function LoginStudent() {
   const { login, logout, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname;
 
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(() => localStorage.getItem(REMEMBER_KEY) || '');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [remember, setRemember] = useState(() => !!localStorage.getItem(REMEMBER_KEY));
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState('');
 
@@ -49,6 +52,9 @@ export default function LoginStudent() {
       return;
     }
 
+    if (remember) localStorage.setItem(REMEMBER_KEY, email.trim());
+    else localStorage.removeItem(REMEMBER_KEY);
+
     toast.success(`¡Bienvenido de vuelta, ${result.user.profile?.fullName || result.user.email}!`);
     navigate(from && from !== '/login' ? from : '/dashboard', { replace: true });
   };
@@ -61,7 +67,7 @@ export default function LoginStudent() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex">
+    <div className="min-h-screen bg-white dark:bg-brand-950 flex transition-colors duration-300">
       {/* Left brand panel */}
       <div className="hidden lg:flex lg:w-[46%] relative overflow-hidden hero-gradient">
         <div className="absolute inset-0 opacity-[0.07]" style={{
@@ -76,7 +82,7 @@ export default function LoginStudent() {
             <Link to="/" className="w-fit">
               <Logo size={30} variant="light" />
             </Link>
-            <Link to="/login" className="inline-flex items-center gap-2 text-blue-200 hover:text-white text-sm font-semibold transition-colors w-fit">
+            <Link to="/login" className="inline-flex items-center gap-2 text-brand-200 hover:text-white text-sm font-semibold transition-colors w-fit">
               <ChevronLeft className="w-4 h-4" /> Volver a portales
             </Link>
           </div>
@@ -86,10 +92,10 @@ export default function LoginStudent() {
               <GraduationCap className="w-3.5 h-3.5 text-accent-400" />
               Portal Estudiante
             </div>
-            <h1 className="text-4xl font-black tracking-tight leading-tight mb-4" style={{ fontFamily: 'Outfit' }}>
+            <h1 className="text-4xl font-black tracking-tight leading-tight mb-4" style={{ fontFamily: 'Plus Jakarta Sans' }}>
               Tu próxima oportunidad<br />empieza aquí.
             </h1>
-            <p className="text-blue-100 text-base max-w-sm leading-relaxed">
+            <p className="text-brand-100 text-base max-w-sm leading-relaxed">
               Postula a empleos y prácticas verificadas, guarda tus favoritos y prepárate con nuestras herramientas de entrevista.
             </p>
 
@@ -100,8 +106,8 @@ export default function LoginStudent() {
                 { label: 'Estudiantes', value: '20+' },
               ].map((s) => (
                 <div key={s.label} className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-3.5">
-                  <p className="text-xl font-black" style={{ fontFamily: 'Outfit' }}>{s.value}</p>
-                  <p className="text-[11px] text-blue-200 font-medium mt-0.5 leading-tight">{s.label}</p>
+                  <p className="text-xl font-black" style={{ fontFamily: 'Plus Jakarta Sans' }}>{s.value}</p>
+                  <p className="text-[11px] text-brand-200 font-medium mt-0.5 leading-tight">{s.label}</p>
                 </div>
               ))}
             </div>
@@ -118,7 +124,7 @@ export default function LoginStudent() {
             <div className="flex items-center gap-1 text-xs">
               <Star className="w-3.5 h-3.5 fill-accent-300 text-accent-300" />
               <span className="font-semibold">4.9/5</span>
-              <span className="text-blue-200">de estudiantes satisfechos</span>
+              <span className="text-brand-200">de estudiantes satisfechos</span>
             </div>
           </div>
         </div>
@@ -129,7 +135,7 @@ export default function LoginStudent() {
         <div className="w-full max-w-sm">
           <div className="lg:hidden flex items-center justify-between mb-6">
             <Link to="/"><Logo size={30} /></Link>
-            <Link to="/login" className="inline-flex items-center gap-2 text-slate-400 hover:text-slate-600 text-sm font-semibold transition-colors">
+            <Link to="/login" className="inline-flex items-center gap-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 text-sm font-semibold transition-colors">
               <ChevronLeft className="w-4 h-4" /> Portales
             </Link>
           </div>
@@ -138,24 +144,24 @@ export default function LoginStudent() {
             <div className="hidden lg:block mb-5">
               <LogoMark size={48} />
             </div>
-            <h2 className="text-2xl font-bold text-brand-900 tracking-tight" style={{ fontFamily: 'Outfit' }}>
+            <h2 className="text-2xl font-bold text-brand-900 dark:text-white tracking-tight" style={{ fontFamily: 'Plus Jakarta Sans' }}>
               Inicia sesión como estudiante
             </h2>
-            <p className="text-sm text-slate-500 mt-1">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
               Usa tu correo institucional o personal registrado.
             </p>
           </div>
 
           {serverError && (
-            <div className="mb-5 p-3.5 bg-rose-50 border border-rose-200 rounded-2xl flex items-start gap-2.5 text-rose-800 text-xs leading-relaxed">
-              <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
+            <div className="mb-5 p-3.5 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-2xl flex items-start gap-2.5 text-rose-800 dark:text-rose-300 text-xs leading-relaxed">
+              <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 flex-shrink-0 mt-0.5" />
               <div>{serverError}</div>
             </div>
           )}
 
           <form onSubmit={handleSubmit} noValidate className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+              <label htmlFor="email" className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
                 Correo electrónico
               </label>
               <div className="relative">
@@ -170,18 +176,18 @@ export default function LoginStudent() {
                   value={email}
                   style={{ paddingLeft: '2.75rem' }}
                   onChange={(e) => { setEmail(e.target.value); if (errors.email) setErrors(p => ({ ...p, email: '' })); if (serverError) setServerError(''); }}
-                  className={`w-full py-2.5 pr-4 text-sm rounded-xl border bg-white transition-all ${
+                  className={`w-full py-2.5 pr-4 text-sm rounded-xl border transition-all ${
                     errors.email ? 'border-rose-400 bg-rose-50/40 focus:ring-4 focus:ring-rose-500/10' : 'border-slate-300 hover:border-slate-400 focus:border-brand-700 focus:ring-4 focus:ring-brand-500/10'
                   }`}
                 />
               </div>
-              {errors.email && <p className="text-xs text-rose-600 mt-1.5 font-medium">{errors.email}</p>}
+              {errors.email && <p className="text-xs text-rose-600 dark:text-rose-400 mt-1.5 font-medium">{errors.email}</p>}
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label htmlFor="password" className="text-xs font-bold text-slate-700 uppercase tracking-wider">Contraseña</label>
-                <a href="#" className="text-xs text-brand-700 hover:text-brand-900 font-semibold hover:underline">¿Olvidaste tu contraseña?</a>
+                <label htmlFor="password" className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Contraseña</label>
+                <a href="#" className="text-xs text-brand-700 dark:text-brand-300 hover:text-brand-900 dark:hover:text-white font-semibold hover:underline">¿Olvidaste tu contraseña?</a>
               </div>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -195,16 +201,27 @@ export default function LoginStudent() {
                   value={password}
                   style={{ paddingLeft: '2.75rem', paddingRight: '2.75rem' }}
                   onChange={(e) => { setPassword(e.target.value); if (errors.password) setErrors(p => ({ ...p, password: '' })); if (serverError) setServerError(''); }}
-                  className={`w-full py-2.5 text-sm rounded-xl border bg-white transition-all ${
+                  className={`w-full py-2.5 text-sm rounded-xl border transition-all ${
                     errors.password ? 'border-rose-400 bg-rose-50/40 focus:ring-4 focus:ring-rose-500/10' : 'border-slate-300 hover:border-slate-400 focus:border-brand-700 focus:ring-4 focus:ring-brand-500/10'
                   }`}
                 />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'} className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer">
+                <button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'} className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer">
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              {errors.password && <p className="text-xs text-rose-600 mt-1.5 font-medium">{errors.password}</p>}
+              {errors.password && <p className="text-xs text-rose-600 dark:text-rose-400 mt-1.5 font-medium">{errors.password}</p>}
             </div>
+
+            <label htmlFor="remember" className="flex items-center gap-2.5 cursor-pointer select-none">
+              <input
+                id="remember"
+                type="checkbox"
+                checked={remember}
+                onChange={(e) => setRemember(e.target.checked)}
+                className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-brand-700 focus:ring-2 focus:ring-brand-500/30 cursor-pointer"
+              />
+              <span className="text-xs font-medium text-slate-600 dark:text-slate-300">Recordar mi correo en este dispositivo</span>
+            </label>
 
             <button
               type="submit"
@@ -218,21 +235,21 @@ export default function LoginStudent() {
           <button
             type="button"
             onClick={autofillDemo}
-            className="w-full mt-4 py-2 rounded-xl text-xs font-semibold bg-brand-50 hover:bg-brand-100 text-brand-800 transition-colors border border-brand-100 cursor-pointer"
+            className="w-full mt-4 py-2 rounded-xl text-xs font-semibold bg-brand-50 dark:bg-white/5 hover:bg-brand-100 dark:hover:bg-white/10 text-brand-800 dark:text-brand-200 transition-colors border border-brand-100 dark:border-white/10 cursor-pointer"
           >
             Usar cuenta de demostración
           </button>
 
-          <div className="mt-6 pt-5 border-t border-slate-100 text-center space-y-3">
-            <p className="text-xs text-slate-500">
+          <div className="mt-6 pt-5 border-t border-slate-100 dark:border-white/10 text-center space-y-3">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               ¿No tienes una cuenta?{' '}
-              <Link to="/registro" className="text-brand-700 font-bold hover:underline">Regístrate gratis</Link>
+              <Link to="/registro" className="text-brand-700 dark:text-brand-300 font-bold hover:underline">Regístrate gratis</Link>
             </p>
-            <div className="flex items-center justify-center gap-4 text-[11px] text-slate-400">
-              <Link to="/login/empresa" className="inline-flex items-center gap-1 hover:text-slate-700 font-medium transition-colors">
+            <div className="flex items-center justify-center gap-4 text-[11px] text-slate-400 dark:text-slate-500">
+              <Link to="/login/empresa" className="inline-flex items-center gap-1 hover:text-slate-700 dark:hover:text-slate-300 font-medium transition-colors">
                 <Building2 className="w-3 h-3" /> Soy empresa
               </Link>
-              <Link to="/login/admin" className="inline-flex items-center gap-1 hover:text-slate-700 font-medium transition-colors">
+              <Link to="/login/admin" className="inline-flex items-center gap-1 hover:text-slate-700 dark:hover:text-slate-300 font-medium transition-colors">
                 <ShieldCheck className="w-3 h-3" /> Soy administrador
               </Link>
             </div>

@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { GraduationCap, Building2, Eye, EyeOff, Loader2, CheckCircle, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { COLOMBIA_CITIES } from '../data/colombia';
 import toast from 'react-hot-toast';
 
 const UNIVERSITIES = ['Universidad Nacional de Colombia', 'Universidad de los Andes', 'Universidad de Antioquia', 'Universidad EAFIT', 'Universidad del Valle', 'Universidad Javeriana', 'Universidad de la Sabana', 'Universidad Externado', 'Universidad ICESI', 'Otra universidad'];
 const CAREERS = ['Ingeniería de Sistemas', 'Ingeniería Industrial', 'Administración de Empresas', 'Contaduría Pública', 'Diseño Gráfico', 'Psicología', 'Derecho', 'Comunicación Social', 'Economía', 'Ingeniería Civil', 'Medicina', 'Marketing', 'Otra carrera'];
 const SECTORS = ['Tecnología', 'Salud', 'Educación', 'Finanzas y Banca', 'Manufactura', 'Retail y Comercio', 'Consultoría', 'Medios y Comunicación', 'Construcción', 'Transporte', 'Otro'];
-const CITIES = ['Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Bucaramanga', 'Pereira', 'Manizales', 'Santa Marta', 'Otra ciudad'];
+const CITIES = [...COLOMBIA_CITIES, 'Otra ciudad'];
 
 function PasswordStrength({ password }) {
   if (!password) return null;

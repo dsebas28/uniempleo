@@ -259,6 +259,31 @@ CREATE TABLE IF NOT EXISTS favorites (
   UNIQUE(student_id, item_type, item_id)
 );
 
+-- Alertas de empleo (preferencias para avisar por correo cuando se publique una vacante que coincida)
+CREATE TABLE IF NOT EXISTS job_alerts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+  area TEXT,
+  city TEXT,
+  modality TEXT,
+  keywords TEXT,
+  active INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Bandeja de correos de alerta enviados (simulado: no se envía un correo real todavía)
+CREATE TABLE IF NOT EXISTS email_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+  job_id INTEGER REFERENCES jobs(id) ON DELETE CASCADE,
+  alert_id INTEGER REFERENCES job_alerts(id) ON DELETE SET NULL,
+  to_email TEXT NOT NULL,
+  subject TEXT NOT NULL,
+  body TEXT NOT NULL,
+  sent_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 -- Índices para performance
 CREATE INDEX IF NOT EXISTS idx_jobs_company ON jobs(company_id);
 CREATE INDEX IF NOT EXISTS idx_jobs_area ON jobs(area);
@@ -269,3 +294,5 @@ CREATE INDEX IF NOT EXISTS idx_applications_student ON applications(student_id);
 CREATE INDEX IF NOT EXISTS idx_applications_job ON applications(job_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id);
 CREATE INDEX IF NOT EXISTS idx_saved_jobs_student ON saved_jobs(student_id);
+CREATE INDEX IF NOT EXISTS idx_job_alerts_student ON job_alerts(student_id);
+CREATE INDEX IF NOT EXISTS idx_email_log_student ON email_log(student_id);

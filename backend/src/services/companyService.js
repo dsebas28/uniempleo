@@ -1,6 +1,7 @@
 const companyModel = require('../models/companyModel');
 const jobModel = require('../models/jobModel');
 const applicationModel = require('../models/applicationModel');
+const jobAlertService = require('./jobAlertService');
 
 const companyService = {
   getProfile(userId) {
@@ -45,6 +46,7 @@ const companyService = {
     }
 
     const jobId = jobModel.create(company.id, jobData);
+    jobAlertService.notifyMatchingStudents(jobId);
     return { id: jobId, message: 'Vacante publicada exitosamente' };
   },
 

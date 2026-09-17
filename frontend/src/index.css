@@ -1,42 +1,64 @@
 @import "tailwindcss";
 
 /* ============================================================
-   UniEmpleo Design System
-   Brand: navy (talent, trust) + amber accent (opportunity)
+   UniEmpleo Design System v3
+   Primario: índigo #4F46E5 · Acento/éxito: esmeralda #10B981
+   Secundario: cielo #0EA5E9 · Advertencia: ámbar #F59E0B · Error: rojo #EF4444
+   Tipografía: Plus Jakarta Sans (display) + Inter (texto)
    ============================================================ */
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 
-  /* Brand navy — primary */
-  --color-brand-50: #eef3fb;
-  --color-brand-100: #d9e5f5;
-  --color-brand-200: #b0c8e9;
-  --color-brand-300: #82a6d9;
-  --color-brand-400: #547fc2;
-  --color-brand-500: #345fa3;
-  --color-brand-600: #244a85;
-  --color-brand-700: #1c3a6b;
-  --color-brand-800: #172f57;
-  --color-brand-900: #0f2140;
-  --color-brand-950: #091530;
+  /* Brand índigo — primario */
+  --color-brand-50: #eef2ff;
+  --color-brand-100: #e0e7ff;
+  --color-brand-200: #c7d2fe;
+  --color-brand-300: #a5b4fc;
+  --color-brand-400: #818cf8;
+  --color-brand-500: #6366f1;
+  --color-brand-600: #4f46e5;
+  --color-brand-700: #4338ca;
+  --color-brand-800: #3730a3;
+  --color-brand-900: #312e81;
+  --color-brand-950: #1e1b4b;
 
-  /* Accent amber/orange — opportunity, CTAs */
-  --color-accent-50: #fff8eb;
-  --color-accent-100: #ffecc2;
-  --color-accent-200: #ffd684;
-  --color-accent-300: #ffbd47;
-  --color-accent-400: #fda824;
-  --color-accent-500: #f5930f;
-  --color-accent-600: #d97706;
-  --color-accent-700: #b45f04;
-  --color-accent-800: #924a06;
+  /* Accent esmeralda — éxito, crecimiento, CTAs */
+  --color-accent-50: #ecfdf5;
+  --color-accent-100: #d1fae5;
+  --color-accent-200: #a7f3d0;
+  --color-accent-300: #6ee7b7;
+  --color-accent-400: #34d399;
+  --color-accent-500: #10b981;
+  --color-accent-600: #059669;
+  --color-accent-700: #047857;
+  --color-accent-800: #065f46;
 }
 
 :root {
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  color-scheme: light;
+
+  --surface: #ffffff;
+  --surface-alt: #f8fafc;
+  --border: #e2e8f0;
+  --ink: #0f172a;
+  --ink-dim: #475569;
+  --ink-faint: #94a3b8;
+}
+
+.dark {
+  color-scheme: dark;
+  --surface: #111827;
+  --surface-alt: #0b1120;
+  --border: #1f2937;
+  --ink: #f1f5f9;
+  --ink-dim: #cbd5e1;
+  --ink-faint: #64748b;
 }
 
 @layer base {
@@ -54,11 +76,12 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: var(--surface-alt);
+  color: var(--ink);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 h1, h2, h3, h4, h5, h6, .font-display {
@@ -88,9 +111,29 @@ input:focus,
 select:focus,
 textarea:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
   background-color: #ffffff;
+}
+
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark input[type="number"],
+.dark input[type="tel"],
+.dark input[type="url"],
+.dark select,
+.dark textarea {
+  background-color: #1f2937;
+  border-color: #374151;
+  color: #f1f5f9;
+}
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+  background-color: #1f2937;
+  border-color: #818cf8;
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
 }
 
 /* Animations */
@@ -123,9 +166,35 @@ textarea:focus {
   animation: fadeIn 0.3s ease forwards;
 }
 
-/* Hero gradient */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up, .animate-fade-in {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Scroll reveal (see components/Reveal.jsx) */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Hero gradient — #1E1B4B a #4F46E5 con patrón sutil de puntos aplicado inline donde se usa */
 .hero-gradient {
-  background: linear-gradient(135deg, #091530 0%, #0f2140 40%, #172f57 75%, #1c3a6b 100%);
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #3730a3 70%, #4f46e5 100%);
 }
 
 /* Glass effect */
@@ -134,6 +203,10 @@ textarea:focus {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(226, 232, 240, 0.8);
+}
+.dark .glass-card {
+  background: rgba(17, 24, 39, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* Custom Scrollbar */
@@ -154,7 +227,7 @@ textarea:focus {
 
 /* Button utilities */
 .btn-primary {
-  background: linear-gradient(135deg, #1c3a6b 0%, #0f2140 100%);
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
   color: #ffffff;
   font-weight: 600;
   cursor: pointer;
@@ -162,31 +235,31 @@ textarea:focus {
   border: none;
 }
 .btn-primary:hover {
-  background: linear-gradient(135deg, #244a85 0%, #172f57 100%);
-  box-shadow: 0 4px 14px rgba(15, 33, 64, 0.35);
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  box-shadow: 0 4px 14px rgba(67, 56, 202, 0.4);
 }
 .btn-primary:active {
   transform: scale(0.99);
 }
 
 .btn-accent {
-  background: linear-gradient(135deg, #fda824 0%, #f5930f 100%);
-  color: #0f2140;
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  color: #022c22;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
 }
 .btn-accent:hover {
-  background: linear-gradient(135deg, #f5930f 0%, #d97706 100%);
-  box-shadow: 0 4px 14px rgba(245, 147, 15, 0.4);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
 }
 .btn-accent:active {
   transform: scale(0.99);
 }
 
 .btn-secondary {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
   color: #ffffff;
   font-weight: 600;
   cursor: pointer;
@@ -194,18 +267,66 @@ textarea:focus {
   border: none;
 }
 .btn-secondary:hover {
-  background: linear-gradient(135deg, #047857 0%, #065f46 100%);
-  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35);
+  background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
 }
 .btn-secondary:active {
   transform: scale(0.99);
 }
 
+.btn-danger {
+  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+}
+.btn-danger:hover {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
+}
+.btn-danger:active {
+  transform: scale(0.99);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink-dim);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover {
+  background: var(--surface-alt);
+  color: var(--ink);
+}
+
 /* Progress bar */
 .progress-bar {
-  background: linear-gradient(90deg, #3b82f6 0%, #6366f1 100%);
+  background: linear-gradient(90deg, #4f46e5 0%, #10b981 100%);
   border-radius: 9999px;
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Skeleton loaders (shimmer) — used by components/LoadingSkeleton.jsx and ui/Skeleton.jsx */
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #e2e8f0 25%, #eef2ff 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+.dark .skeleton {
+  background: linear-gradient(90deg, #1f2937 25%, #312e81 50%, #1f2937 75%);
+  background-size: 200% 100%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; background: #e2e8f0; }
+  .dark .skeleton { background: #1f2937; }
 }
 
 /* Custom scrollbar for scroll containers */

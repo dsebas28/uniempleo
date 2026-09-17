@@ -76,6 +76,15 @@ function getReports(req, res) {
   }
 }
 
+function getEmailLog(req, res) {
+  try {
+    const data = adminService.getEmailLog();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
 module.exports = {
   getDashboard,
   getUsers,
@@ -84,5 +93,6 @@ module.exports = {
   approveCompany,
   getAdminJobs,
   updateJobStatus,
-  getReports
+  getReports,
+  getEmailLog
 };

@@ -13,9 +13,9 @@ import toast from 'react-hot-toast';
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'Todos los estados' },
-  { value: 'sent', label: 'Postulado', color: 'bg-blue-50 text-blue-700 border-blue-200' },
+  { value: 'sent', label: 'Postulado', color: 'bg-brand-50 text-brand-700 border-brand-200' },
   { value: 'reviewing', label: 'En Revisión', color: 'bg-amber-50 text-amber-700 border-amber-200' },
-  { value: 'preselected', label: 'Preseleccionado', color: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
+  { value: 'preselected', label: 'Preseleccionado', color: 'bg-brand-50 text-brand-700 border-brand-200' },
   { value: 'interview', label: 'Entrevista', color: 'bg-purple-50 text-purple-700 border-purple-200' },
   { value: 'selected', label: 'Seleccionado', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
   { value: 'rejected', label: 'No seleccionado', color: 'bg-rose-50 text-rose-700 border-rose-200' },
@@ -115,11 +115,11 @@ export default function Candidates() {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'sent':
-        return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200"><Clock className="w-3 h-3" /> Postulado</span>;
+        return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-200"><Clock className="w-3 h-3" /> Postulado</span>;
       case 'reviewing':
         return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200"><Eye className="w-3 h-3" /> En Revisión</span>;
       case 'preselected':
-        return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200"><Sparkles className="w-3 h-3" /> Preseleccionado</span>;
+        return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-200"><Sparkles className="w-3 h-3" /> Preseleccionado</span>;
       case 'interview':
         return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200"><Calendar className="w-3 h-3" /> Entrevista</span>;
       case 'selected':
@@ -137,7 +137,7 @@ export default function Candidates() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
-            <Users className="w-7 h-7 text-indigo-600" />
+            <Users className="w-7 h-7 text-brand-600" />
             Gestión de Candidatos y Postulantes
           </h1>
           <p className="text-sm text-slate-500 mt-1">
@@ -147,7 +147,7 @@ export default function Candidates() {
         <div className="flex items-center gap-3">
           <Link
             to="/empresa/vacantes/nueva"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-xl shadow-sm transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-xl shadow-sm transition-all"
           >
             <Briefcase className="w-4 h-4" />
             Publicar Nueva Vacante
@@ -166,7 +166,7 @@ export default function Candidates() {
               placeholder="Buscar por nombre, carrera o universidad..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+              className="w-full pl-9 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
             />
           </div>
 
@@ -178,7 +178,7 @@ export default function Candidates() {
                 setSelectedJob(e.target.value);
                 setSearchParams(e.target.value ? { jobId: e.target.value } : {});
               }}
-              className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium text-slate-700"
+              className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 font-medium text-slate-700"
             >
               <option value="">Todas las vacantes activas ({jobs.length})</option>
               {jobs.map((j) => (
@@ -198,7 +198,7 @@ export default function Candidates() {
               onClick={() => setStatusFilter(st.value)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                 statusFilter === st.value
-                  ? 'bg-indigo-600 text-white shadow-xs'
+                  ? 'bg-brand-600 text-white shadow-xs'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
@@ -211,7 +211,7 @@ export default function Candidates() {
       {/* Candidates Table or Empty State */}
       {loading ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-12 flex flex-col items-center justify-center">
-          <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mb-3" />
+          <Loader2 className="w-8 h-8 text-brand-600 animate-spin mb-3" />
           <p className="text-sm text-slate-500 font-medium">Cargando postulaciones y perfiles de candidatos...</p>
         </div>
       ) : filteredCandidates.length === 0 ? (
@@ -223,7 +223,7 @@ export default function Candidates() {
           onAction={selectedJob ? () => setSelectedJob('') : undefined}
         />
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+        <div className="bg-white dark:bg-white/[0.04] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -246,7 +246,7 @@ export default function Candidates() {
                     <tr key={c.id} className="hover:bg-slate-50/70 transition-colors group">
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-indigo-700 text-white flex items-center justify-center font-bold text-xs uppercase shadow-xs flex-shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-500 to-brand-700 text-white flex items-center justify-center font-bold text-xs uppercase shadow-xs flex-shrink-0">
                             {initials}
                           </div>
                           <div>
@@ -277,7 +277,7 @@ export default function Candidates() {
 
                       <td className="py-4 px-4">
                         <div className="text-slate-700 font-medium text-xs flex items-center gap-1">
-                          <GraduationCap className="w-3.5 h-3.5 text-indigo-500 flex-shrink-0" />
+                          <GraduationCap className="w-3.5 h-3.5 text-brand-500 flex-shrink-0" />
                           <span className="line-clamp-1">{c.career || 'Carrera universitaria'}</span>
                         </div>
                         <div className="text-xs text-slate-400 mt-0.5 line-clamp-1">
@@ -286,7 +286,7 @@ export default function Candidates() {
                       </td>
 
                       <td className="py-4 px-4 text-center">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-50 text-brand-700 border border-brand-200">
                           <Percent className="w-3 h-3 mr-0.5" />
                           {c.matchPercentage || 85}
                         </span>
@@ -304,7 +304,7 @@ export default function Candidates() {
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
                             title="Descargar hoja de vida en PDF"
-                            className="inline-flex items-center gap-1 px-3 py-1.5 mr-1.5 rounded-lg text-xs font-medium bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors"
+                            className="inline-flex items-center gap-1 px-3 py-1.5 mr-1.5 rounded-lg text-xs font-medium bg-brand-50 text-brand-700 hover:bg-brand-100 transition-colors"
                           >
                             <Download className="w-3.5 h-3.5" />
                             CV
@@ -312,7 +312,7 @@ export default function Candidates() {
                         )}
                         <button
                           onClick={() => setSelectedCandidate(c)}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-brand-50 hover:text-brand-600 transition-colors"
                         >
                           <Eye className="w-3.5 h-3.5" />
                           Ver Perfil
@@ -334,7 +334,7 @@ export default function Candidates() {
             {/* Modal Header */}
             <div className="p-6 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur-md z-10">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-500 to-indigo-700 text-white flex items-center justify-center font-bold text-lg overflow-hidden flex-shrink-0">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-500 to-brand-700 text-white flex items-center justify-center font-bold text-lg overflow-hidden flex-shrink-0">
                   {selectedCandidate.profile_photo ? (
                     <img src={selectedCandidate.profile_photo} alt={selectedCandidate.full_name} className="w-full h-full object-cover" />
                   ) : (
@@ -359,7 +359,7 @@ export default function Candidates() {
                     href={selectedCandidate.cv_pdf}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-brand-600 text-white hover:bg-brand-700 transition-colors"
                   >
                     <Download className="w-3.5 h-3.5" />
                     Descargar CV
@@ -390,7 +390,7 @@ export default function Candidates() {
                       disabled={isUpdatingStatus}
                       value={pendingStatus}
                       onChange={(e) => setPendingStatus(e.target.value)}
-                      className="text-xs font-semibold px-3 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                      className="text-xs font-semibold px-3 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none"
                     >
                       <option value="sent">Marcar como Postulado (Enviado)</option>
                       <option value="reviewing">Marcar En Revisión</option>
@@ -402,7 +402,7 @@ export default function Candidates() {
                     <button
                       onClick={() => handleStatusChange(selectedCandidate.id, pendingStatus, messageDraft)}
                       disabled={isUpdatingStatus || pendingStatus === selectedCandidate.status}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-brand-600 text-white hover:bg-brand-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       {isUpdatingStatus ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
                       Actualizar estado
@@ -420,7 +420,7 @@ export default function Candidates() {
                     value={messageDraft}
                     onChange={(e) => setMessageDraft(e.target.value)}
                     placeholder="Ej. Te esperamos el lunes 14 a las 3pm por videollamada, revisa tu correo para el enlace..."
-                    className="w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-none"
+                    className="w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none"
                   />
                   <div className="flex items-center justify-between mt-1.5">
                     <p className="text-[11px] text-slate-400">
@@ -560,7 +560,7 @@ export default function Candidates() {
                   <div className="space-y-2">
                     {selectedCandidate.educations.map((edu) => (
                       <div key={edu.id} className="flex items-start gap-2.5 p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                        <GraduationCap className="w-4 h-4 text-indigo-500 mt-0.5 flex-shrink-0" />
+                        <GraduationCap className="w-4 h-4 text-brand-500 mt-0.5 flex-shrink-0" />
                         <div>
                           <p className="text-xs font-semibold text-slate-800">{edu.degree}{edu.field ? ` en ${edu.field}` : ''}</p>
                           <p className="text-xs text-slate-500">{edu.institution}</p>
@@ -581,7 +581,7 @@ export default function Candidates() {
                   <div className="space-y-2">
                     {selectedCandidate.experiences.map((exp) => (
                       <div key={exp.id} className="flex items-start gap-2.5 p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                        <Briefcase className="w-4 h-4 text-indigo-500 mt-0.5 flex-shrink-0" />
+                        <Briefcase className="w-4 h-4 text-brand-500 mt-0.5 flex-shrink-0" />
                         <div>
                           <p className="text-xs font-semibold text-slate-800">{exp.position}</p>
                           <p className="text-xs text-slate-500">{exp.company}</p>
@@ -616,7 +616,7 @@ export default function Candidates() {
                   <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Competencias y Habilidades</h4>
                   <div className="flex flex-wrap gap-1.5">
                     {selectedCandidate.skills.map((sk, idx) => (
-                      <span key={idx} className="px-2.5 py-1 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-lg text-xs font-medium">
+                      <span key={idx} className="px-2.5 py-1 bg-brand-50 text-brand-700 border border-brand-100 rounded-lg text-xs font-medium">
                         {sk}
                       </span>
                     ))}

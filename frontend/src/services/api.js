@@ -83,6 +83,10 @@ export const studentAPI = {
     });
   },
   deletePhoto: () => api.delete('/student/photo'),
+  getJobAlerts: () => api.get('/student/job-alerts'),
+  createJobAlert: (data) => api.post('/student/job-alerts', data),
+  toggleJobAlert: (id, active) => api.put(`/student/job-alerts/${id}`, { active }),
+  deleteJobAlert: (id) => api.delete(`/student/job-alerts/${id}`),
 };
 
 // ===========================
@@ -116,6 +120,7 @@ export const adminAPI = {
   getJobs: () => api.get('/admin/jobs'),
   updateJob: (id, data) => api.put(`/admin/jobs/${id}`, data),
   getReports: () => api.get('/admin/reports'),
+  getEmailLog: () => api.get('/admin/email-log'),
 };
 
 // ===========================

@@ -66,7 +66,7 @@ export default function AdminUsers() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
-            <Users className="w-7 h-7 text-indigo-600" />
+            <Users className="w-7 h-7 text-brand-600" />
             Gestión de Usuarios
           </h1>
           <p className="text-sm text-slate-500 mt-1">
@@ -74,8 +74,8 @@ export default function AdminUsers() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 bg-indigo-50 border border-indigo-100 px-4 py-2 rounded-xl text-xs font-semibold text-indigo-700">
-          <UserCheck className="w-4 h-4 text-indigo-600" />
+        <div className="flex items-center gap-2 bg-brand-50 border border-brand-100 px-4 py-2 rounded-xl text-xs font-semibold text-brand-700">
+          <UserCheck className="w-4 h-4 text-brand-600" />
           <span>{total} Usuarios Totales</span>
         </div>
       </div>
@@ -90,7 +90,7 @@ export default function AdminUsers() {
             placeholder="Buscar usuario por correo electrónico..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+            className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
           />
         </div>
 
@@ -110,7 +110,7 @@ export default function AdminUsers() {
               }}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                 roleFilter === tab.id
-                  ? 'bg-indigo-600 text-white shadow-xs'
+                  ? 'bg-brand-600 text-white shadow-xs'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
@@ -123,7 +123,7 @@ export default function AdminUsers() {
       {/* Users Table */}
       {loading ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-16 flex flex-col items-center justify-center">
-          <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mb-3" />
+          <Loader2 className="w-8 h-8 text-brand-600 animate-spin mb-3" />
           <p className="text-sm text-slate-500 font-medium">Cargando directorio de usuarios...</p>
         </div>
       ) : filteredUsers.length === 0 ? (
@@ -133,7 +133,7 @@ export default function AdminUsers() {
           <p className="text-xs text-slate-500 mt-1">Intenta con otros términos de búsqueda o selecciona otro rol.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+        <div className="bg-white dark:bg-white/[0.04] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -164,11 +164,11 @@ export default function AdminUsers() {
 
                     <td className="py-4 px-4">
                       {u.role === 'student' ? (
-                        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-200">
                           Estudiante
                         </span>
                       ) : u.role === 'company' ? (
-                        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-200">
                           Empresa
                         </span>
                       ) : (

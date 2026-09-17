@@ -48,7 +48,7 @@ export default function AdminReports() {
   if (loading) {
     return (
       <div className="bg-white rounded-2xl border border-slate-200 p-16 flex flex-col items-center justify-center">
-        <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mb-3" />
+        <Loader2 className="w-8 h-8 text-brand-600 animate-spin mb-3" />
         <p className="text-sm text-slate-500 font-medium">Generando análisis y reportes de la plataforma...</p>
       </div>
     );
@@ -65,7 +65,7 @@ export default function AdminReports() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
-            <BarChart3 className="w-7 h-7 text-indigo-600" />
+            <BarChart3 className="w-7 h-7 text-brand-600" />
             Reportes e Inteligencia Laboral
           </h1>
           <p className="text-sm text-slate-500 mt-1">
@@ -75,7 +75,7 @@ export default function AdminReports() {
 
         <button
           onClick={handleExport}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl shadow-xs transition-all cursor-pointer"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-xl shadow-xs transition-all cursor-pointer"
         >
           <Download className="w-4 h-4" />
           Exportar / Imprimir Reporte
@@ -91,7 +91,7 @@ export default function AdminReports() {
               <h3 className="text-sm font-bold text-slate-900">Demanda Laboral por Ciudad</h3>
               <p className="text-xs text-slate-400">Distribución territorial de vacantes universitarias</p>
             </div>
-            <span className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
+            <span className="p-2 rounded-lg bg-brand-50 text-brand-600">
               <MapPin className="w-4 h-4" />
             </span>
           </div>

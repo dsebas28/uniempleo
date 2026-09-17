@@ -5,11 +5,12 @@ import { jobsAPI } from '../services/api';
 import JobCard from '../components/JobCard';
 import { JobCardSkeleton } from '../components/LoadingSkeleton';
 import EmptyState from '../components/EmptyState';
+import { COLOMBIA_CITIES } from '../data/colombia';
 
 const AREAS = ['Tecnología', 'Marketing', 'Diseño', 'Administración', 'Contabilidad', 'Recursos Humanos', 'Ingeniería', 'Salud', 'Educación', 'Legal'];
 const MODALITIES = ['Remoto', 'Híbrido', 'Presencial'];
 const CONTRACT_TYPES = ['Tiempo completo', 'Medio tiempo', 'Prácticas', 'Freelance', 'Contrato de aprendizaje'];
-const CITIES = ['Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Bucaramanga', 'Pereira'];
+const CITIES = COLOMBIA_CITIES;
 
 export default function Jobs() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -21,8 +22,8 @@ export default function Jobs() {
 
   const [filters, setFilters] = useState({
     keyword: searchParams.get('keyword') || '',
-    city: '',
-    modality: '',
+    city: searchParams.get('city') || '',
+    modality: searchParams.get('modality') || '',
     contractType: '',
     area: '',
     noExperience: false,

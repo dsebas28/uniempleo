@@ -1,4 +1,4 @@
-export function LogoMark({ size = 40, className = '', bg = '#172f57', stroke = '#ffffff', dot = '#f5930f' }) {
+export function LogoMark({ size = 40, className = '', bg = '#4338ca', stroke = '#ffffff', dot = '#10b981' }) {
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" className={className} aria-hidden="true">
       <rect x="0" y="0" width="40" height="40" rx="11" fill={bg} />
@@ -25,17 +25,26 @@ export default function Logo({ size = 40, tagline = false, variant = 'default', 
     <div className={`flex items-center gap-2.5 ${className}`}>
       <LogoMark
         size={size}
-        bg={light ? '#f5930f' : '#172f57'}
-        stroke={light ? '#0f2140' : '#ffffff'}
-        dot={light ? '#0f2140' : '#f5930f'}
+        bg={light ? '#10b981' : '#4338ca'}
+        stroke={light ? '#022c22' : '#ffffff'}
+        dot={light ? '#022c22' : '#10b981'}
       />
       <div className="leading-none">
-        <span className="font-extrabold tracking-tight" style={{ fontFamily: 'Outfit', fontSize: size * 0.5 }}>
-          <span style={{ color: light ? '#ffffff' : '#244a85' }}>uni</span>
-          <span style={{ color: light ? '#ffb648' : '#0f2140' }}>empleo</span>
+        <span className="font-extrabold tracking-tight" style={{ fontFamily: 'Plus Jakarta Sans', fontSize: size * 0.5 }}>
+          {light ? (
+            <>
+              <span style={{ color: '#ffffff' }}>uni</span>
+              <span style={{ color: '#6ee7b7' }}>empleo</span>
+            </>
+          ) : (
+            <>
+              <span className="text-brand-600 dark:text-brand-300">uni</span>
+              <span className="text-brand-900 dark:text-white">empleo</span>
+            </>
+          )}
         </span>
         {tagline && (
-          <p className={`text-[11px] font-medium tracking-wide mt-0.5 ${light ? 'text-brand-200' : 'text-slate-500'}`}>
+          <p className={`text-[11px] font-medium tracking-wide mt-0.5 ${light ? 'text-brand-200' : 'text-slate-500 dark:text-slate-400'}`}>
             Tu talento, tu primer empleo
           </p>
         )}

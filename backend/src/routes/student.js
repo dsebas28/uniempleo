@@ -5,7 +5,8 @@ const { uploadResume: uploadResumeMiddleware, uploadPhoto: uploadPhotoMiddleware
 const {
   getStudentProfile, updateStudentProfile, getDashboard, getApplications, apply, getSavedJobs, saveJob, unsaveJob, uploadResume, deleteResume,
   addEducation, updateEducation, deleteEducation, addExperience, updateExperience, deleteExperience,
-  uploadPhoto, deletePhoto, addLanguage, updateLanguage, deleteLanguage
+  uploadPhoto, deletePhoto, addLanguage, updateLanguage, deleteLanguage,
+  getJobAlerts, createJobAlert, toggleJobAlert, deleteJobAlert
 } = require('../controllers/studentController');
 
 router.use(authenticate, requireRole('student'));
@@ -17,6 +18,12 @@ router.post('/jobs/:jobId/apply', apply);
 router.get('/saved-jobs', getSavedJobs);
 router.post('/saved-jobs/:jobId', saveJob);
 router.delete('/saved-jobs/:jobId', unsaveJob);
+
+// Alertas de empleo
+router.get('/job-alerts', getJobAlerts);
+router.post('/job-alerts', createJobAlert);
+router.put('/job-alerts/:id', toggleJobAlert);
+router.delete('/job-alerts/:id', deleteJobAlert);
 
 // Educación
 router.post('/educations', addEducation);

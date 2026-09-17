@@ -16,11 +16,11 @@ export default function EmptyState({ type = 'default', title, description, actio
 
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-      <div className="w-20 h-20 rounded-2xl bg-gray-50 border-2 border-dashed border-gray-200 flex items-center justify-center mb-6">
-        <Icon size={32} className="text-gray-300" />
+      <div className="w-20 h-20 rounded-2xl bg-slate-50 dark:bg-white/5 border-2 border-dashed border-slate-200 dark:border-white/10 flex items-center justify-center mb-6">
+        <Icon size={32} className="text-slate-300 dark:text-slate-600" />
       </div>
-      <h3 className="text-lg font-semibold text-gray-700 mb-2">{title || 'Sin resultados'}</h3>
-      <p className="text-sm text-gray-400 max-w-sm leading-relaxed mb-6">
+      <h3 className="text-lg font-semibold text-slate-700 dark:text-slate-200 mb-2">{title || 'Sin resultados'}</h3>
+      <p className="text-sm text-slate-400 dark:text-slate-500 max-w-sm leading-relaxed mb-6">
         {description || 'No se encontraron elementos para mostrar.'}
       </p>
       {(actionLabel && actionTo) && (

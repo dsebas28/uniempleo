@@ -2,10 +2,15 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Edit3, Download, Eye, Loader2, Plus, X, Save, Camera, UploadCloud, FileText, Trash2, CheckCircle2,
-  GraduationCap, Pencil, Phone, Languages as LanguagesIcon, Plane, Car, Home, Check
+  GraduationCap, Pencil, Phone, Languages as LanguagesIcon, Plane, Car, Home, Check, MapPin, Briefcase
 } from 'lucide-react';
 import { studentAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { COLOMBIA_DEPARTMENTS, findDepartmentByCity } from '../../data/colombia';
+import Badge, { LEVEL_VARIANT, AVAILABILITY_VARIANT, MODALITY_VARIANT } from '../../components/ui/Badge';
+import Avatar from '../../components/ui/Avatar';
+import ProgressBar from '../../components/ui/ProgressBar';
+import Card, { CardHeader } from '../../components/ui/Card';
 import toast from 'react-hot-toast';
 
 const ENGLISH_LEVELS = ['Básico', 'Elemental', 'Intermedio', 'Intermedio alto', 'Avanzado', 'Nativo'];
@@ -30,10 +35,10 @@ function calculateAge(birthDate) {
 function Modal({ title, onClose, onSubmit, submitting, children }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-          <h3 className="font-bold text-slate-900">{title}</h3>
-          <button onClick={onClose} className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors">
+      <div className="bg-white dark:bg-[#111827] rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/10">
+          <h3 className="font-bold text-slate-900 dark:text-white">{title}</h3>
+          <button onClick={onClose} className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-600 dark:hover:text-white transition-colors">
             <X size={18} />
           </button>
         </div>
@@ -53,8 +58,9 @@ function Modal({ title, onClose, onSubmit, submitting, children }) {
   );
 }
 
-const fieldCls = "w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100 bg-slate-50 focus:bg-white transition-all";
-const labelCls = "block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5";
+const fieldCls = "w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-500/20 bg-slate-50 dark:bg-white/5 dark:text-white focus:bg-white dark:focus:bg-white/5 transition-all";
+const labelCls = "block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5";
+const cardCls = "bg-white dark:bg-white/[0.04] rounded-2xl border border-slate-100 dark:border-white/10 shadow-sm p-6";
 
 export default function StudentProfile() {
   const { user, updateUser } = useAuth();
@@ -102,7 +108,7 @@ export default function StudentProfile() {
         maritalStatus: res.data.marital_status || '',
         documentId: res.data.document_id || '',
         address: res.data.address || '',
-        department: res.data.department || '',
+        department: res.data.department || findDepartmentByCity(res.data.city) || '',
         country: res.data.country || 'Colombia',
         educationLevel: res.data.education_level || '',
         interests: res.data.interests || '',
@@ -343,31 +349,32 @@ export default function StudentProfile() {
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
-      <Loader2 size={32} className="text-blue-500 animate-spin" />
+      <Loader2 size={32} className="text-brand-500 animate-spin" />
     </div>
   );
 
   const completion = profile?.profile_completion || 0;
+  const citiesForDepartment = COLOMBIA_DEPARTMENTS.find(d => d.name === form.department)?.cities || [];
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Outfit' }}>Mi perfil</h1>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white" style={{ fontFamily: 'Plus Jakarta Sans' }}>Mi perfil</h1>
         <div className="flex gap-2">
           <Link to="/perfil/cv" target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white rounded-xl btn-accent">
+            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl btn-accent">
             <Download size={15} /> Descargar CV
           </Link>
           {!editing ? (
             <button onClick={() => setEditing(true)}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-blue-700 border-2 border-blue-200 rounded-xl hover:bg-blue-50 transition-colors">
+              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-brand-700 dark:text-brand-300 border-2 border-brand-200 dark:border-brand-500/30 rounded-xl hover:bg-brand-50 dark:hover:bg-brand-500/10 transition-colors">
               <Edit3 size={15} /> Editar
             </button>
           ) : (
             <>
               <button onClick={() => setEditing(false)}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/15 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                 <X size={15} /> Cancelar
               </button>
               <button onClick={handleSave} disabled={saving}
@@ -381,20 +388,28 @@ export default function StudentProfile() {
       </div>
 
       {/* Profile card */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-white/[0.04] rounded-2xl border border-slate-100 dark:border-white/10 shadow-sm overflow-hidden">
         {/* Cover */}
-        <div className="h-24 bg-gradient-to-r from-blue-600 to-indigo-700" />
-        <div className="px-7 pb-7">
-          <div className="flex items-end gap-5 -mt-6 mb-5">
-            <div className="relative">
+        <div className="h-28 sm:h-32 bg-gradient-to-r from-brand-600 via-brand-700 to-accent-600 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-[0.08]" style={{
+            backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
+            backgroundSize: '20px 20px',
+          }} />
+        </div>
+
+        {/* Avatar + name — only the avatar overlaps the cover (its own negative margin);
+            the name block stays in normal flow so it's never clipped by the card's overflow-hidden. */}
+        <div className="px-6 sm:px-7 pb-7">
+          <div className="flex flex-col sm:flex-row sm:items-end gap-4 mb-6">
+            <div className="relative flex-shrink-0 -mt-12">
               <input type="file" ref={photoInputRef} accept="image/jpeg,image/png,image/webp" onChange={handlePhotoSelect} className="hidden" />
-              <div className="w-20 h-20 rounded-2xl border-4 border-white bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-2xl shadow-lg overflow-hidden">
+              <div className="w-24 h-24 rounded-2xl border-4 border-white dark:border-[#111827] shadow-lg overflow-hidden bg-white dark:bg-[#111827]">
                 {uploadingPhoto ? (
-                  <Loader2 size={22} className="animate-spin" />
-                ) : profile?.profile_photo ? (
-                  <img src={profile.profile_photo} alt={profile.full_name} className="w-full h-full object-cover" />
+                  <div className="w-full h-full flex items-center justify-center bg-brand-50 dark:bg-brand-500/10">
+                    <Loader2 size={22} className="animate-spin text-brand-600" />
+                  </div>
                 ) : (
-                  profile?.full_name?.charAt(0)?.toUpperCase() || 'E'
+                  <Avatar name={profile?.full_name || 'Estudiante'} src={profile?.profile_photo} size="xl" className="w-full h-full rounded-none" />
                 )}
               </div>
               {editing && (
@@ -404,16 +419,16 @@ export default function StudentProfile() {
                     onClick={() => photoInputRef.current?.click()}
                     disabled={uploadingPhoto}
                     title="Cambiar foto"
-                    className="absolute -bottom-1 -right-1 w-7 h-7 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-md hover:bg-blue-700 transition-colors cursor-pointer disabled:opacity-60"
+                    className="absolute -bottom-1.5 -right-1.5 w-8 h-8 bg-brand-600 text-white rounded-full flex items-center justify-center shadow-md hover:bg-brand-700 transition-colors cursor-pointer disabled:opacity-60"
                   >
-                    <Camera size={13} />
+                    <Camera size={14} />
                   </button>
                   {profile?.profile_photo && (
                     <button
                       type="button"
                       onClick={handlePhotoDelete}
                       title="Quitar foto"
-                      className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center shadow-md hover:bg-red-600 transition-colors cursor-pointer"
+                      className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-rose-500 text-white rounded-full flex items-center justify-center shadow-md hover:bg-rose-600 transition-colors cursor-pointer"
                     >
                       <X size={12} />
                     </button>
@@ -421,26 +436,22 @@ export default function StudentProfile() {
                 </>
               )}
             </div>
-            <div className="flex-1 pb-2">
-              <h2 className="text-xl font-bold text-gray-900">{profile?.full_name}</h2>
-              {profile?.headline && <p className="text-sm text-gray-600">{profile.headline}</p>}
-              <p className="text-blue-600 text-sm font-medium">{profile?.career} · {profile?.university}</p>
-              <p className="text-gray-400 text-xs mt-0.5">{profile?.city} · {profile?.semester}° semestre</p>
+
+            {/* Name block sits BELOW the banner, never overlapping it */}
+            <div className="flex-1 min-w-0 pt-1">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white truncate">{profile?.full_name}</h2>
+              {profile?.headline && <p className="text-sm text-slate-600 dark:text-slate-300 mt-0.5">{profile.headline}</p>}
+              <p className="text-brand-600 dark:text-brand-300 text-sm font-medium mt-1">{profile?.career} · {profile?.university}</p>
+              <p className="text-slate-400 dark:text-slate-500 text-xs mt-1 flex items-center gap-1.5">
+                <MapPin size={12} /> {profile?.city}{profile?.department ? `, ${profile.department}` : ''} · {profile?.semester}° semestre
+              </p>
             </div>
           </div>
 
           {/* Profile completion */}
-          <div className="mb-6 p-4 bg-gray-50 rounded-xl">
-            <div className="flex justify-between text-sm mb-2">
-              <span className="font-medium text-gray-700">Perfil completado</span>
-              <span className={`font-bold ${completion >= 70 ? 'text-emerald-600' : completion >= 40 ? 'text-blue-600' : 'text-orange-500'}`}>
-                {completion}%
-              </span>
-            </div>
-            <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
-              <div className="progress-bar h-full" style={{ width: `${completion}%` }} />
-            </div>
-            <p className="text-xs text-gray-400 mt-1.5">
+          <div className="mb-6 p-4 bg-slate-50 dark:bg-white/5 rounded-xl">
+            <ProgressBar value={completion} label="Perfil completado" showValue />
+            <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">
               {completion < 50 ? 'Completa tu perfil para mejorar tus oportunidades.' :
                completion < 80 ? 'Buen progreso. Agrega más información para destacar.' :
                '¡Excelente! Tu perfil es muy completo.'}
@@ -452,71 +463,93 @@ export default function StudentProfile() {
             {editing ? (
               <>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Nombre completo</label>
+                  <label className={labelCls}>Nombre completo</label>
                   <input type="text" value={form.fullName} onChange={(e) => setForm(p => ({ ...p, fullName: e.target.value }))}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none input-focus bg-gray-50 focus:bg-white" />
+                    className={fieldCls} />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Ciudad</label>
-                  <input type="text" value={form.city} onChange={(e) => setForm(p => ({ ...p, city: e.target.value }))}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none input-focus bg-gray-50 focus:bg-white" />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Título profesional</label>
+                  <label className={labelCls}>Título profesional</label>
                   <input type="text" value={form.headline} onChange={(e) => setForm(p => ({ ...p, headline: e.target.value }))}
-                    placeholder="Ej. Estudiante de Ingeniería de Sistemas Computacionales"
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none input-focus bg-gray-50 focus:bg-white" />
+                    placeholder="Ej. Estudiante de Ingeniería de Sistemas"
+                    className={fieldCls} />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Teléfono</label>
+                  <label className={labelCls}>Departamento</label>
+                  <select
+                    value={form.department}
+                    onChange={(e) => {
+                      const dep = e.target.value;
+                      const cities = COLOMBIA_DEPARTMENTS.find(d => d.name === dep)?.cities || [];
+                      setForm(p => ({ ...p, department: dep, city: cities.includes(p.city) ? p.city : (cities[0] || '') }));
+                    }}
+                    className={fieldCls}
+                  >
+                    <option value="">Seleccionar</option>
+                    {COLOMBIA_DEPARTMENTS.map(d => <option key={d.name} value={d.name}>{d.name}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className={labelCls}>Ciudad</label>
+                  <select
+                    value={form.city}
+                    onChange={(e) => setForm(p => ({ ...p, city: e.target.value }))}
+                    disabled={!form.department}
+                    className={`${fieldCls} disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    <option value="">{form.department ? 'Seleccionar' : 'Elige un departamento primero'}</option>
+                    {citiesForDepartment.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className={labelCls}>Teléfono</label>
                   <input type="tel" value={form.phone} onChange={(e) => setForm(p => ({ ...p, phone: e.target.value }))}
                     placeholder="+57 300 000 0000"
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none input-focus bg-gray-50 focus:bg-white" />
+                    className={fieldCls} />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Nivel de inglés</label>
+                  <label className={labelCls}>Nivel de inglés</label>
                   <select value={form.englishLevel} onChange={(e) => setForm(p => ({ ...p, englishLevel: e.target.value }))}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none input-focus bg-gray-50">
+                    className={fieldCls}>
                     {ENGLISH_LEVELS.map(l => <option key={l} value={l}>{l}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Disponibilidad</label>
+                  <label className={labelCls}>Disponibilidad</label>
                   <select value={form.availability} onChange={(e) => setForm(p => ({ ...p, availability: e.target.value }))}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none input-focus bg-gray-50">
+                    className={fieldCls}>
                     {AVAILABILITIES.map(a => <option key={a} value={a}>{a}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Modalidad preferida</label>
+                  <label className={labelCls}>Modalidad preferida</label>
                   <select value={form.preferredModality} onChange={(e) => setForm(p => ({ ...p, preferredModality: e.target.value }))}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none input-focus bg-gray-50">
+                    className={fieldCls}>
                     {MODALITIES.map(m => <option key={m} value={m}>{m}</option>)}
                   </select>
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Sobre mí</label>
+                  <label className={labelCls}>Sobre mí</label>
                   <textarea rows={4} value={form.aboutMe} onChange={(e) => setForm(p => ({ ...p, aboutMe: e.target.value }))}
                     placeholder="Describe tus objetivos profesionales, fortalezas y lo que buscas en un empleo..."
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm outline-none input-focus bg-gray-50 focus:bg-white resize-none" />
+                    className={`${fieldCls} resize-none`} />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Desplazamiento y movilidad</label>
+                  <label className={labelCls} style={{ marginBottom: '0.5rem' }}>Desplazamiento y movilidad</label>
                   <div className="flex flex-wrap gap-4">
                     <label className="flex items-center gap-2 cursor-pointer select-none">
                       <input type="checkbox" checked={form.availableTravel} onChange={(e) => setForm(p => ({ ...p, availableTravel: e.target.checked }))}
-                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                      <span className="text-sm text-gray-600">Disponibilidad para viajar</span>
+                        className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-brand-600 focus:ring-brand-500" />
+                      <span className="text-sm text-slate-600 dark:text-slate-300">Disponibilidad para viajar</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer select-none">
                       <input type="checkbox" checked={form.availableRelocate} onChange={(e) => setForm(p => ({ ...p, availableRelocate: e.target.checked }))}
-                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                      <span className="text-sm text-gray-600">Disponibilidad para cambiar de residencia</span>
+                        className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-brand-600 focus:ring-brand-500" />
+                      <span className="text-sm text-slate-600 dark:text-slate-300">Disponibilidad para cambiar de residencia</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer select-none">
                       <input type="checkbox" checked={form.hasVehicle} onChange={(e) => setForm(p => ({ ...p, hasVehicle: e.target.checked }))}
-                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                      <span className="text-sm text-gray-600">Tengo vehículo propio</span>
+                        className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-brand-600 focus:ring-brand-500" />
+                      <span className="text-sm text-slate-600 dark:text-slate-300">Tengo vehículo propio</span>
                     </label>
                   </div>
                 </div>
@@ -524,45 +557,39 @@ export default function StudentProfile() {
             ) : (
               <>
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Inglés</p>
-                  <span className="inline-block px-3 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-lg">
-                    {profile?.english_level || 'No especificado'}
-                  </span>
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1.5">Inglés</p>
+                  <Badge variant={LEVEL_VARIANT[profile?.english_level] || 'neutral'}>{profile?.english_level || 'No especificado'}</Badge>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Disponibilidad</p>
-                  <span className="inline-block px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-lg">
-                    {profile?.availability || 'No especificado'}
-                  </span>
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1.5">Disponibilidad</p>
+                  <Badge variant={AVAILABILITY_VARIANT[profile?.availability] || 'neutral'}>{profile?.availability || 'No especificado'}</Badge>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Modalidad</p>
-                  <span className="inline-block px-3 py-1 bg-purple-50 text-purple-700 text-xs font-semibold rounded-lg">
-                    {profile?.preferred_modality || 'No especificado'}
-                  </span>
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1.5">Modalidad</p>
+                  <Badge variant={MODALITY_VARIANT[profile?.preferred_modality] || 'neutral'}>{profile?.preferred_modality || 'No especificado'}</Badge>
                 </div>
                 {profile?.phone && (
                   <div>
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Teléfono</p>
-                    <p className="text-sm text-gray-700 flex items-center gap-1.5"><Phone size={13} className="text-gray-400" /> {profile.phone}</p>
+                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Teléfono</p>
+                    <p className="text-sm text-slate-700 dark:text-slate-200 flex items-center gap-1.5"><Phone size={13} className="text-slate-400" /> {profile.phone}</p>
                   </div>
                 )}
                 {profile?.about_me && (
                   <div className="md:col-span-2">
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Sobre mí</p>
-                    <p className="text-sm text-gray-600 leading-relaxed">{profile.about_me}</p>
+                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Sobre mí</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{profile.about_me}</p>
                   </div>
                 )}
                 <div className="md:col-span-2">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Desplazamiento y movilidad</p>
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Desplazamiento y movilidad</p>
                   <div className="space-y-1.5">
                     {[
                       { icon: Plane, ok: !!profile?.available_travel, label: 'disponibilidad para viajar' },
                       { icon: Home, ok: !!profile?.available_relocate, label: 'disponibilidad para cambiar de residencia' },
                       { icon: Car, ok: !!profile?.has_vehicle, label: 'vehículo propio' },
                     ].map((item, i) => (
-                      <p key={i} className={`text-sm flex items-center gap-2 ${item.ok ? 'text-gray-700' : 'text-gray-400'}`}>
-                        {item.ok ? <Check size={14} className="text-emerald-500 flex-shrink-0" /> : <X size={14} className="text-gray-300 flex-shrink-0" />}
+                      <p key={i} className={`text-sm flex items-center gap-2 ${item.ok ? 'text-slate-700 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500'}`}>
+                        {item.ok ? <Check size={14} className="text-accent-500 flex-shrink-0" /> : <X size={14} className="text-slate-300 dark:text-slate-600 flex-shrink-0" />}
                         <item.icon size={13} className="flex-shrink-0" />
                         {item.ok ? `Tengo ${item.label}` : `No tengo ${item.label}`}
                       </p>
@@ -575,78 +602,73 @@ export default function StudentProfile() {
         </div>
       </div>
 
-      {/* Personal info */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <h3 className="font-semibold text-gray-900 mb-4">Información personal</h3>
+      {/* Información personal + Habilidades/Idiomas — grid de 2 columnas */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className={cardCls}>
+        <h3 className="font-semibold text-slate-900 dark:text-white mb-4">Información personal</h3>
         {editing ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Fecha de nacimiento</label>
+              <label className={labelCls}>Fecha de nacimiento</label>
               <input type="date" value={form.birthDate} onChange={(e) => setForm(p => ({ ...p, birthDate: e.target.value }))}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none input-focus bg-gray-50 focus:bg-white" />
+                className={fieldCls} />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Género</label>
+              <label className={labelCls}>Género</label>
               <select value={form.gender} onChange={(e) => setForm(p => ({ ...p, gender: e.target.value }))}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none input-focus bg-gray-50">
+                className={fieldCls}>
                 <option value="">Seleccionar</option>
                 {GENDERS.map(g => <option key={g} value={g}>{g}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Estado civil</label>
+              <label className={labelCls}>Estado civil</label>
               <select value={form.maritalStatus} onChange={(e) => setForm(p => ({ ...p, maritalStatus: e.target.value }))}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none input-focus bg-gray-50">
+                className={fieldCls}>
                 <option value="">Seleccionar</option>
                 {MARITAL_STATUSES.map(m => <option key={m} value={m}>{m}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Nacionalidad</label>
+              <label className={labelCls}>Nacionalidad</label>
               <input type="text" value={form.nationality} onChange={(e) => setForm(p => ({ ...p, nationality: e.target.value }))}
                 placeholder="Ej. Colombiana"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none input-focus bg-gray-50 focus:bg-white" />
+                className={fieldCls} />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Documento de identidad</label>
+              <label className={labelCls}>Documento de identidad</label>
               <input type="text" value={form.documentId} onChange={(e) => setForm(p => ({ ...p, documentId: e.target.value }))}
                 placeholder="Ej. 1.234.567.890"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none input-focus bg-gray-50 focus:bg-white" />
+                className={fieldCls} />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Nivel educativo</label>
+              <label className={labelCls}>Nivel educativo</label>
               <select value={form.educationLevel} onChange={(e) => setForm(p => ({ ...p, educationLevel: e.target.value }))}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none input-focus bg-gray-50">
+                className={fieldCls}>
                 <option value="">Seleccionar</option>
                 {EDUCATION_LEVELS.map(l => <option key={l} value={l}>{l}</option>)}
               </select>
             </div>
-            <div className="md:col-span-2">
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Dirección</label>
+            <div className="sm:col-span-2">
+              <label className={labelCls}>Dirección</label>
               <input type="text" value={form.address} onChange={(e) => setForm(p => ({ ...p, address: e.target.value }))}
                 placeholder="Ej. Calle 10 #15-20"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none input-focus bg-gray-50 focus:bg-white" />
+                className={fieldCls} />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Departamento</label>
-              <input type="text" value={form.department} onChange={(e) => setForm(p => ({ ...p, department: e.target.value }))}
-                placeholder="Ej. Quindío"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none input-focus bg-gray-50 focus:bg-white" />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">País</label>
+              <label className={labelCls}>País</label>
               <input type="text" value={form.country} onChange={(e) => setForm(p => ({ ...p, country: e.target.value }))}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none input-focus bg-gray-50 focus:bg-white" />
+                className={fieldCls} />
             </div>
-            <div className="md:col-span-2">
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Intereses</label>
+            <div>
+              <label className={labelCls}>Intereses</label>
               <input type="text" value={form.interests} onChange={(e) => setForm(p => ({ ...p, interests: e.target.value }))}
-                placeholder="Ej. Tecnología, lectura, deportes"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none input-focus bg-gray-50 focus:bg-white" />
+                placeholder="Ej. Tecnología, lectura"
+                className={fieldCls} />
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
               ['Fecha de nacimiento', profile?.birth_date ? `${new Date(profile.birth_date).toLocaleDateString('es-CO')} (${calculateAge(profile.birth_date)} años)` : null],
               ['Género', profile?.gender],
@@ -655,84 +677,85 @@ export default function StudentProfile() {
               ['Documento de identidad', profile?.document_id],
               ['Nivel educativo', profile?.education_level],
               ['Dirección', profile?.address],
-              ['Departamento', profile?.department],
               ['País', profile?.country],
               ['Intereses', profile?.interests],
             ].filter(([, value]) => value).map(([label, value]) => (
               <div key={label}>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">{label}</p>
-                <p className="text-sm text-gray-700">{value}</p>
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">{label}</p>
+                <p className="text-sm text-slate-700 dark:text-slate-200">{value}</p>
               </div>
             ))}
-            {[profile?.birth_date, profile?.gender, profile?.marital_status, profile?.nationality, profile?.document_id, profile?.education_level, profile?.address, profile?.department, profile?.interests].every(v => !v) && (
-              <p className="text-sm text-gray-400 md:col-span-3">Aún no has agregado tu información personal.</p>
+            {[profile?.birth_date, profile?.gender, profile?.marital_status, profile?.nationality, profile?.document_id, profile?.education_level, profile?.address, profile?.interests].every(v => !v) && (
+              <p className="text-sm text-slate-400 sm:col-span-2">Aún no has agregado tu información personal.</p>
             )}
           </div>
         )}
       </div>
 
       {/* Skills */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <h3 className="font-semibold text-gray-900 mb-4">Habilidades</h3>
+      <div className={cardCls}>
+        <h3 className="font-semibold text-slate-900 dark:text-white mb-4">Habilidades</h3>
         <div className="flex flex-wrap gap-2 mb-4">
           {(profile?.skills || []).map(skill => (
-            <span key={skill.id || skill.name} className="flex items-center gap-1.5 pl-3 pr-1.5 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-lg border border-blue-100">
+            <span key={skill.id || skill.name} className="flex items-center gap-1.5 pl-3 pr-1.5 py-1.5 bg-brand-50 dark:bg-brand-500/15 text-brand-700 dark:text-brand-200 text-xs font-medium rounded-lg border border-brand-100 dark:border-brand-500/20">
               {skill.name}
               <button
                 type="button"
                 onClick={() => removeSkill(skill.name)}
                 disabled={savingSkills}
                 aria-label={`Eliminar habilidad ${skill.name}`}
-                className="p-0.5 rounded hover:bg-blue-100 text-blue-400 hover:text-blue-700 transition-colors cursor-pointer disabled:opacity-50"
+                className="p-0.5 rounded hover:bg-brand-100 dark:hover:bg-brand-500/20 text-brand-400 hover:text-brand-700 dark:hover:text-white transition-colors cursor-pointer disabled:opacity-50"
               >
                 <X size={12} />
               </button>
             </span>
           ))}
           {(profile?.skills || []).length === 0 && (
-            <p className="text-sm text-gray-400">No has agregado habilidades aún.</p>
+            <p className="text-sm text-slate-400">No has agregado habilidades aún.</p>
           )}
         </div>
-        <form onSubmit={addSkill} className="flex gap-2 max-w-sm">
+        <form onSubmit={addSkill} className="flex gap-2">
           <input
             type="text"
             value={skillInput}
             onChange={(e) => setSkillInput(e.target.value)}
             placeholder="Ej. Excel, Photoshop, Python..."
-            className="flex-1 px-3.5 py-2 rounded-xl border border-gray-200 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100 bg-gray-50 focus:bg-white transition-all"
+            className={`flex-1 ${fieldCls}`}
           />
           <button
             type="submit"
             disabled={savingSkills || !skillInput.trim()}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-brand-800 bg-brand-50 hover:bg-brand-100 rounded-xl transition-colors disabled:opacity-50 cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-brand-800 dark:text-brand-200 bg-brand-50 dark:bg-brand-500/15 hover:bg-brand-100 dark:hover:bg-brand-500/25 rounded-lg transition-colors disabled:opacity-50 cursor-pointer flex-shrink-0"
           >
             {savingSkills ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />} Agregar
           </button>
         </form>
       </div>
+      </div>
 
-      {/* Languages */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      {/* Idiomas + Educación — grid de 2 columnas */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className={cardCls}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-            <LanguagesIcon size={16} className="text-gray-400" /> Idiomas
+          <h3 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+            <LanguagesIcon size={16} className="text-slate-400" /> Idiomas
           </h3>
           <button onClick={() => setLangModal('new')}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-brand-800 bg-brand-50 hover:bg-brand-100 rounded-lg transition-colors cursor-pointer">
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-brand-800 dark:text-brand-200 bg-brand-50 dark:bg-brand-500/15 hover:bg-brand-100 dark:hover:bg-brand-500/25 rounded-lg transition-colors cursor-pointer">
             <Plus size={14} /> Agregar
           </button>
         </div>
         {(profile?.languages || []).length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {profile.languages.map((lang) => (
-              <div key={lang.id} className="group flex items-center gap-2 pl-3 pr-1.5 py-1.5 bg-gray-50 rounded-lg border border-gray-100">
-                <span className="text-sm text-gray-800 font-medium">{lang.language}</span>
-                <span className="text-xs text-gray-400">· {lang.level}</span>
+              <div key={lang.id} className="group flex items-center gap-2 pl-3 pr-1.5 py-1.5 bg-slate-50 dark:bg-white/5 rounded-lg border border-slate-100 dark:border-white/10">
+                <span className="text-sm text-slate-800 dark:text-slate-100 font-medium">{lang.language}</span>
+                <span className="text-xs text-slate-400">· {lang.level}</span>
                 <div className="hidden group-hover:flex items-center gap-0.5 ml-1">
-                  <button onClick={() => setLangModal(lang)} aria-label="Editar" className="p-1 rounded-md text-gray-400 hover:bg-white hover:text-brand-700 transition-colors cursor-pointer">
+                  <button onClick={() => setLangModal(lang)} aria-label="Editar" className="p-1 rounded-md text-slate-400 hover:bg-white dark:hover:bg-white/10 hover:text-brand-700 dark:hover:text-brand-300 transition-colors cursor-pointer">
                     <Pencil size={12} />
                   </button>
-                  <button onClick={() => handleLangDelete(lang.id)} aria-label="Eliminar" className="p-1 rounded-md text-gray-400 hover:bg-white hover:text-red-600 transition-colors cursor-pointer">
+                  <button onClick={() => handleLangDelete(lang.id)} aria-label="Eliminar" className="p-1 rounded-md text-slate-400 hover:bg-white dark:hover:bg-white/10 hover:text-rose-600 transition-colors cursor-pointer">
                     <Trash2 size={12} />
                   </button>
                 </div>
@@ -740,38 +763,38 @@ export default function StudentProfile() {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-gray-400">No has agregado idiomas aún.</p>
+          <p className="text-sm text-slate-400">No has agregado idiomas aún.</p>
         )}
       </div>
 
       {/* Education */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <div className={cardCls}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-gray-900">Educación</h3>
+          <h3 className="font-semibold text-slate-900 dark:text-white">Educación</h3>
           <button onClick={() => setEduModal('new')}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-brand-800 bg-brand-50 hover:bg-brand-100 rounded-lg transition-colors cursor-pointer">
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-brand-800 dark:text-brand-200 bg-brand-50 dark:bg-brand-500/15 hover:bg-brand-100 dark:hover:bg-brand-500/25 rounded-lg transition-colors cursor-pointer">
             <Plus size={14} /> Agregar
           </button>
         </div>
         {(profile?.educations || []).length > 0 ? (
           <div className="space-y-3">
             {profile.educations.map((edu) => (
-              <div key={edu.id} className="group flex items-start gap-3 p-3 rounded-xl bg-gray-50">
-                <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
-                  <GraduationCap size={16} className="text-blue-600" />
+              <div key={edu.id} className="group flex items-start gap-3 p-3 rounded-xl bg-slate-50 dark:bg-white/5">
+                <div className="w-9 h-9 rounded-xl bg-brand-100 dark:bg-brand-500/15 flex items-center justify-center flex-shrink-0">
+                  <GraduationCap size={16} className="text-brand-600 dark:text-brand-300" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-900 text-sm">{edu.degree}{edu.field ? ` en ${edu.field}` : ''}</p>
-                  <p className="text-xs text-blue-600">{edu.institution}</p>
+                  <p className="font-semibold text-slate-900 dark:text-white text-sm">{edu.degree}{edu.field ? ` en ${edu.field}` : ''}</p>
+                  <p className="text-xs text-brand-600 dark:text-brand-300">{edu.institution}</p>
                   {(edu.start_year || edu.end_year) && (
-                    <p className="text-xs text-gray-400">{edu.start_year} — {edu.current ? 'Presente' : edu.end_year}</p>
+                    <p className="text-xs text-slate-400">{edu.start_year} — {edu.current ? 'Presente' : edu.end_year}</p>
                   )}
                 </div>
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                  <button onClick={() => setEduModal(edu)} aria-label="Editar" className="p-1.5 rounded-lg text-gray-400 hover:bg-white hover:text-brand-700 transition-colors cursor-pointer">
+                  <button onClick={() => setEduModal(edu)} aria-label="Editar" className="p-1.5 rounded-lg text-slate-400 hover:bg-white dark:hover:bg-white/10 hover:text-brand-700 dark:hover:text-brand-300 transition-colors cursor-pointer">
                     <Pencil size={14} />
                   </button>
-                  <button onClick={() => handleEduDelete(edu.id)} aria-label="Eliminar" className="p-1.5 rounded-lg text-gray-400 hover:bg-white hover:text-red-600 transition-colors cursor-pointer">
+                  <button onClick={() => handleEduDelete(edu.id)} aria-label="Eliminar" className="p-1.5 rounded-lg text-slate-400 hover:bg-white dark:hover:bg-white/10 hover:text-rose-600 transition-colors cursor-pointer">
                     <Trash2 size={14} />
                   </button>
                 </div>
@@ -779,37 +802,38 @@ export default function StudentProfile() {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-gray-400">No has agregado información educativa.</p>
+          <p className="text-sm text-slate-400">No has agregado información educativa.</p>
         )}
+      </div>
       </div>
 
       {/* Experience */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <div className={cardCls}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-gray-900">Experiencia laboral</h3>
+          <h3 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2"><Briefcase size={16} className="text-slate-400" /> Experiencia laboral</h3>
           <button onClick={() => setExpModal('new')}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-brand-800 bg-brand-50 hover:bg-brand-100 rounded-lg transition-colors cursor-pointer">
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-brand-800 dark:text-brand-200 bg-brand-50 dark:bg-brand-500/15 hover:bg-brand-100 dark:hover:bg-brand-500/25 rounded-lg transition-colors cursor-pointer">
             <Plus size={14} /> Agregar
           </button>
         </div>
         {(profile?.experiences || []).length > 0 ? (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {profile.experiences.map((exp) => (
-              <div key={exp.id} className="group flex items-start gap-3 p-3 rounded-xl bg-gray-50">
-                <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0 text-emerald-600 font-bold text-sm">
+              <div key={exp.id} className="group flex items-start gap-3 p-3 rounded-xl bg-slate-50 dark:bg-white/5">
+                <div className="w-9 h-9 rounded-xl bg-accent-100 dark:bg-accent-500/15 flex items-center justify-center flex-shrink-0 text-accent-700 dark:text-accent-300 font-bold text-sm">
                   {exp.company?.charAt(0)?.toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-900 text-sm">{exp.position}</p>
-                  <p className="text-xs text-emerald-600">{exp.company}</p>
-                  <p className="text-xs text-gray-400">{exp.start_date} — {exp.current ? 'Presente' : exp.end_date}</p>
-                  {exp.description && <p className="text-xs text-gray-500 mt-1">{exp.description}</p>}
+                  <p className="font-semibold text-slate-900 dark:text-white text-sm">{exp.position}</p>
+                  <p className="text-xs text-accent-700 dark:text-accent-300">{exp.company}</p>
+                  <p className="text-xs text-slate-400">{exp.start_date} — {exp.current ? 'Presente' : exp.end_date}</p>
+                  {exp.description && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{exp.description}</p>}
                 </div>
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                  <button onClick={() => setExpModal(exp)} aria-label="Editar" className="p-1.5 rounded-lg text-gray-400 hover:bg-white hover:text-brand-700 transition-colors cursor-pointer">
+                  <button onClick={() => setExpModal(exp)} aria-label="Editar" className="p-1.5 rounded-lg text-slate-400 hover:bg-white dark:hover:bg-white/10 hover:text-brand-700 dark:hover:text-brand-300 transition-colors cursor-pointer">
                     <Pencil size={14} />
                   </button>
-                  <button onClick={() => handleExpDelete(exp.id)} aria-label="Eliminar" className="p-1.5 rounded-lg text-gray-400 hover:bg-white hover:text-red-600 transition-colors cursor-pointer">
+                  <button onClick={() => handleExpDelete(exp.id)} aria-label="Eliminar" className="p-1.5 rounded-lg text-slate-400 hover:bg-white dark:hover:bg-white/10 hover:text-rose-600 transition-colors cursor-pointer">
                     <Trash2 size={14} />
                   </button>
                 </div>
@@ -817,12 +841,12 @@ export default function StudentProfile() {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-gray-400">No has agregado experiencia laboral. ¡No te preocupes, muchas vacantes son para personas sin experiencia!</p>
+          <p className="text-sm text-slate-400">No has agregado experiencia laboral. ¡No te preocupes, muchas vacantes son para personas sin experiencia!</p>
         )}
       </div>
 
       {/* Hoja de vida en PDF */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6">
+      <div className="bg-gradient-to-r from-brand-600 to-accent-600 rounded-2xl p-6">
         <input
           type="file"
           ref={fileInputRef}
@@ -841,7 +865,7 @@ export default function StudentProfile() {
                 <p className="font-semibold flex items-center gap-1.5">
                   Hoja de vida adjunta <CheckCircle2 size={15} className="text-emerald-300" />
                 </p>
-                <p className="text-sm text-blue-100 truncate">{profile.cv_original_name || 'curriculum.pdf'}</p>
+                <p className="text-sm text-brand-100 truncate">{profile.cv_original_name || 'curriculum.pdf'}</p>
               </div>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
@@ -849,7 +873,7 @@ export default function StudentProfile() {
                 href={profile.cv_pdf}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2.5 bg-white text-blue-700 font-semibold text-sm rounded-xl hover:bg-blue-50 transition-colors"
+                className="flex items-center gap-2 px-4 py-2.5 bg-white text-brand-700 font-semibold text-sm rounded-xl hover:bg-brand-50 transition-colors"
               >
                 <Eye size={16} /> Ver PDF
               </a>
@@ -875,7 +899,7 @@ export default function StudentProfile() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="text-white">
               <h3 className="font-semibold mb-1">Sube tu hoja de vida en PDF</h3>
-              <p className="text-sm text-blue-100">
+              <p className="text-sm text-brand-100">
                 Adjúntala para que las empresas la revisen al postularte. Formato PDF, máximo 5MB.
               </p>
               {uploadingResume && (
@@ -887,7 +911,7 @@ export default function StudentProfile() {
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadingResume}
-              className="flex items-center gap-2 px-5 py-2.5 bg-white text-blue-700 font-semibold text-sm rounded-xl hover:bg-blue-50 transition-colors flex-shrink-0 disabled:opacity-70"
+              className="flex items-center gap-2 px-5 py-2.5 bg-white text-brand-700 font-semibold text-sm rounded-xl hover:bg-brand-50 transition-colors flex-shrink-0 disabled:opacity-70"
             >
               {uploadingResume ? <Loader2 size={16} className="animate-spin" /> : <UploadCloud size={16} />}
               {uploadingResume ? `Subiendo... ${uploadProgress}%` : 'Subir CV (PDF)'}

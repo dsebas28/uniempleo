@@ -61,13 +61,13 @@ export default function JobCard({ job, saved: initialSaved = false, onSaveToggle
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm card-hover group cursor-pointer overflow-hidden">
+    <div className="bg-white dark:bg-white/[0.06] rounded-2xl border border-gray-100 dark:border-white/10 shadow-sm card-hover group cursor-pointer overflow-hidden">
       <Link to={`/empleos/${job.id}`} className="block p-5">
         {/* Header */}
         <div className="flex items-start justify-between gap-3 mb-4">
           <div className="flex items-start gap-3 min-w-0">
             {/* Logo placeholder */}
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-100 flex items-center justify-center flex-shrink-0 text-blue-600 font-bold text-lg overflow-hidden">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-50 to-brand-100 dark:from-white/10 dark:to-white/5 border border-brand-100 dark:border-white/10 flex items-center justify-center flex-shrink-0 text-brand-700 dark:text-brand-300 font-bold text-lg overflow-hidden">
               {job.company_logo ? (
                 <img src={job.company_logo} alt={job.company_name} className="w-full h-full object-cover" />
               ) : (
@@ -75,8 +75,8 @@ export default function JobCard({ job, saved: initialSaved = false, onSaveToggle
               )}
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-medium text-gray-500 truncate">{job.company_name}</p>
-              <h3 className="font-semibold text-gray-900 text-base leading-tight mt-0.5 group-hover:text-blue-700 transition-colors line-clamp-2">
+              <p className="text-xs font-medium text-gray-500 dark:text-slate-400 truncate">{job.company_name}</p>
+              <h3 className="font-semibold text-gray-900 dark:text-white text-base leading-tight mt-0.5 group-hover:text-brand-700 dark:group-hover:text-brand-300 transition-colors line-clamp-2">
                 {job.title}
               </h3>
             </div>
@@ -86,7 +86,7 @@ export default function JobCard({ job, saved: initialSaved = false, onSaveToggle
               onClick={handleSave}
               disabled={saving}
               className={`flex-shrink-0 p-2 rounded-lg transition-all duration-200 ${
-                saved ? 'text-rose-600 bg-rose-50' : 'text-gray-400 hover:text-rose-600 hover:bg-rose-50'
+                saved ? 'text-rose-600 bg-rose-50 dark:bg-rose-500/10' : 'text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10'
               }`}
               aria-label={saved ? 'Eliminar de favoritos' : 'Guardar en favoritos'}
             >
@@ -116,19 +116,19 @@ export default function JobCard({ job, saved: initialSaved = false, onSaveToggle
 
         {/* Details */}
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-xs text-gray-500">
-            <MapPin size={13} className="text-gray-400 flex-shrink-0" />
+          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-slate-400">
+            <MapPin size={13} className="text-gray-400 dark:text-slate-500 flex-shrink-0" />
             <span className="truncate">{job.city}</span>
           </div>
-          <div className="flex items-center gap-2 text-xs text-gray-500">
-            <DollarSign size={13} className="text-gray-400 flex-shrink-0" />
-            <span className="font-medium text-gray-700">{formatSalary(job.salary_min, job.salary_max)}</span>
+          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-slate-400">
+            <DollarSign size={13} className="text-gray-400 dark:text-slate-500 flex-shrink-0" />
+            <span className="font-medium text-gray-700 dark:text-slate-200">{formatSalary(job.salary_min, job.salary_max)}</span>
           </div>
-          <div className="flex items-center gap-2 text-xs text-gray-500">
-            <Clock size={13} className="text-gray-400 flex-shrink-0" />
+          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-slate-400">
+            <Clock size={13} className="text-gray-400 dark:text-slate-500 flex-shrink-0" />
             <span>{timeAgo(job.created_at)}</span>
             {job.applicants_count > 0 && (
-              <span className="ml-auto text-blue-600 font-medium">{job.applicants_count} postulantes</span>
+              <span className="ml-auto text-brand-600 dark:text-brand-300 font-medium">{job.applicants_count} postulantes</span>
             )}
           </div>
         </div>
@@ -138,7 +138,7 @@ export default function JobCard({ job, saved: initialSaved = false, onSaveToggle
       <div className="px-5 pb-4">
         <Link
           to={`/empleos/${job.id}`}
-          className="block w-full text-center py-2.5 text-sm font-semibold text-blue-700 border-2 border-blue-100 rounded-xl hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all duration-200"
+          className="block w-full text-center py-2.5 text-sm font-semibold text-brand-700 dark:text-brand-300 border-2 border-brand-100 dark:border-white/10 rounded-xl hover:bg-brand-700 hover:text-white hover:border-brand-700 dark:hover:bg-brand-600 dark:hover:border-brand-600 transition-all duration-200"
         >
           Ver oferta
         </Link>

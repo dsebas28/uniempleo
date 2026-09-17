@@ -3,6 +3,7 @@ const path = require('path');
 const studentModel = require('../models/studentModel');
 const jobModel = require('../models/jobModel');
 const applicationModel = require('../models/applicationModel');
+const jobAlertService = require('./jobAlertService');
 
 // Calcula qué tan completo está el perfil para orientar al estudiante
 function calculateCompletion(s) {
@@ -125,6 +126,27 @@ const studentService = {
     if (!student) throw new Error('Perfil de estudiante no encontrado');
     studentModel.unsaveJob(student.id, jobId);
     return { message: 'Oferta eliminada de favoritos' };
+  },
+
+  // ---- Alertas de empleo ----
+  getJobAlerts(userId) {
+    const student = requireStudent(userId);
+    return jobAlertService.getMyAlerts(student.id);
+  },
+
+  createJobAlert(userId, data) {
+    const student = requireStudent(userId);
+    return jobAlertService.createAlert(student.id, data);
+  },
+
+  toggleJobAlert(userId, alertId, active) {
+    const student = requireStudent(userId);
+    return jobAlertService.toggleAlert(student.id, alertId, active);
+  },
+
+  deleteJobAlert(userId, alertId) {
+    const student = requireStudent(userId);
+    return jobAlertService.deleteAlert(student.id, alertId);
   },
 
   // Recalcula y guarda el % de perfil completado tras cambios en educación/experiencia/idiomas/foto
