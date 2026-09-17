@@ -214,8 +214,8 @@ export default function Home() {
         </div>
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
-            {/* Left: copy + search */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center mb-10 lg:mb-14">
+            {/* Left: copy */}
             <div className="text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-brand-100 text-xs font-semibold mb-6 backdrop-blur-md">
                 <Zap size={13} className="text-accent-400" />
@@ -227,83 +227,85 @@ export default function Home() {
                 <span className="text-accent-400">comienza aquí</span>
               </h1>
 
-              <p className="text-base text-brand-100/80 mb-9 leading-relaxed max-w-xl mx-auto lg:mx-0">
+              <p className="text-base text-brand-100/80 leading-relaxed max-w-xl mx-auto lg:mx-0">
                 Conectamos tu talento universitario con empresas que valoran el potencial de aprendizaje. Sin experiencia requerida, sin barreras.
               </p>
-
-              {/* Search bar — pill segmentado */}
-              <form onSubmit={handleSearch} className="max-w-2xl mx-auto lg:mx-0">
-                <div className="flex flex-col sm:flex-row bg-white rounded-2xl sm:rounded-full shadow-2xl shadow-brand-950/30 p-2 gap-1 sm:gap-0">
-                  <div className="flex-1 flex items-center gap-2.5 px-4 py-2.5 sm:border-r border-slate-100 rounded-full min-w-0 sm:min-w-[180px]">
-                    <Search className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                    <div className="w-full min-w-0 text-left">
-                      <label htmlFor="hero-keyword" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide whitespace-nowrap">Cargo o palabra clave</label>
-                      <input
-                        id="hero-keyword"
-                        type="text"
-                        placeholder="Ej. Desarrollador..."
-                        value={keyword}
-                        onChange={(e) => setKeyword(e.target.value)}
-                        className="w-full text-slate-800 placeholder-slate-400 text-sm border-0 focus:ring-0 outline-none bg-transparent p-0"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2.5 px-4 py-2.5 sm:border-r border-slate-100 sm:w-40">
-                    <MapPin className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                    <div className="w-full min-w-0 text-left">
-                      <label htmlFor="hero-city" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide">Ciudad</label>
-                      <select
-                        id="hero-city"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        className="w-full text-slate-800 text-sm border-0 focus:ring-0 outline-none bg-transparent p-0 appearance-none"
-                      >
-                        <option value="">Cualquiera</option>
-                        {COLOMBIA_CITIES.map(c => <option key={c} value={c}>{c}</option>)}
-                      </select>
-                    </div>
-                  </div>
-                  <div className="hidden sm:flex items-center gap-2.5 px-4 py-2.5 sm:w-36">
-                    <Laptop className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                    <div className="w-full min-w-0 text-left">
-                      <label htmlFor="hero-modality" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide">Modalidad</label>
-                      <select
-                        id="hero-modality"
-                        value={modality}
-                        onChange={(e) => setModality(e.target.value)}
-                        className="w-full text-slate-800 text-sm border-0 focus:ring-0 outline-none bg-transparent p-0 appearance-none"
-                      >
-                        <option value="">Cualquiera</option>
-                        {HERO_MODALITIES.map(m => <option key={m} value={m}>{m}</option>)}
-                      </select>
-                    </div>
-                  </div>
-                  <button
-                    type="submit"
-                    className="px-6 py-3 text-sm font-bold rounded-full btn-accent flex items-center justify-center gap-2 flex-shrink-0"
-                  >
-                    Buscar <Search className="w-4 h-4" />
-                  </button>
-                </div>
-              </form>
-
-              {/* Quick tags */}
-              <div className="flex flex-wrap gap-2 justify-center lg:justify-start mt-5">
-                {['Sin experiencia', 'Prácticas', 'Remoto', 'Tecnología', 'Marketing'].map(tag => (
-                  <button
-                    key={tag}
-                    onClick={() => navigate(`/empleos?keyword=${encodeURIComponent(tag)}`)}
-                    className="px-3 py-1 rounded-full text-xs font-medium text-white/90 bg-white/10 border border-white/15 hover:bg-white/20 transition-colors cursor-pointer"
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
             </div>
 
             {/* Right: product mockup (equivalente a la foto grande) */}
             <div className="hidden lg:block">
               <HeroMockup />
+            </div>
+          </div>
+
+          {/* Search bar — pill segmentado, a todo el ancho del hero */}
+          <div className="max-w-4xl mx-auto">
+            <form onSubmit={handleSearch}>
+              <div className="flex flex-col sm:flex-row bg-white rounded-3xl sm:rounded-full shadow-2xl shadow-brand-950/30 p-2.5 gap-1.5 sm:gap-0">
+                <div className="flex-1 flex items-center gap-3 px-6 py-4 sm:border-r border-slate-100 rounded-full min-w-0">
+                  <Search className="w-5 h-5 text-slate-400 flex-shrink-0" />
+                  <div className="w-full min-w-0 text-left">
+                    <label htmlFor="hero-keyword" className="block text-xs font-bold text-slate-400 uppercase tracking-wide whitespace-nowrap">Cargo o palabra clave</label>
+                    <input
+                      id="hero-keyword"
+                      type="text"
+                      placeholder="Ej. Desarrollador, Marketing..."
+                      value={keyword}
+                      onChange={(e) => setKeyword(e.target.value)}
+                      className="w-full text-slate-800 placeholder-slate-400 text-base border-0 focus:ring-0 outline-none bg-transparent p-0"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 px-6 py-4 sm:border-r border-slate-100 sm:w-56">
+                  <MapPin className="w-5 h-5 text-slate-400 flex-shrink-0" />
+                  <div className="w-full min-w-0 text-left">
+                    <label htmlFor="hero-city" className="block text-xs font-bold text-slate-400 uppercase tracking-wide">Ciudad</label>
+                    <select
+                      id="hero-city"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      className="w-full text-slate-800 text-base border-0 focus:ring-0 outline-none bg-transparent p-0 appearance-none"
+                    >
+                      <option value="">Cualquiera</option>
+                      {COLOMBIA_CITIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div className="hidden sm:flex items-center gap-3 px-6 py-4 sm:w-48">
+                  <Laptop className="w-5 h-5 text-slate-400 flex-shrink-0" />
+                  <div className="w-full min-w-0 text-left">
+                    <label htmlFor="hero-modality" className="block text-xs font-bold text-slate-400 uppercase tracking-wide">Modalidad</label>
+                    <select
+                      id="hero-modality"
+                      value={modality}
+                      onChange={(e) => setModality(e.target.value)}
+                      className="w-full text-slate-800 text-base border-0 focus:ring-0 outline-none bg-transparent p-0 appearance-none"
+                    >
+                      <option value="">Cualquiera</option>
+                      {HERO_MODALITIES.map(m => <option key={m} value={m}>{m}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  className="px-9 py-4 text-base font-bold rounded-full btn-accent flex items-center justify-center gap-2 flex-shrink-0"
+                >
+                  Buscar <Search className="w-5 h-5" />
+                </button>
+              </div>
+            </form>
+
+            {/* Quick tags */}
+            <div className="flex flex-wrap gap-2 justify-center mt-5">
+              {['Sin experiencia', 'Prácticas', 'Remoto', 'Tecnología', 'Marketing'].map(tag => (
+                <button
+                  key={tag}
+                  onClick={() => navigate(`/empleos?keyword=${encodeURIComponent(tag)}`)}
+                  className="px-3 py-1 rounded-full text-xs font-medium text-white/90 bg-white/10 border border-white/15 hover:bg-white/20 transition-colors cursor-pointer"
+                >
+                  {tag}
+                </button>
+              ))}
             </div>
           </div>
         </div>
