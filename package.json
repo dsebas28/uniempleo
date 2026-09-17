@@ -1,0 +1,13 @@
+{
+  "name": "uniempleo-root",
+  "version": "1.0.0",
+  "description": "UniEmpleo - Plataforma de Empleo Universitario",
+  "private": true,
+  "scripts": {
+    "start": "node start.js",
+    "dev": "node start.js",
+    "backend": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm run dev",
+    "seed": "cd backend && node src/database/seed.js"
+  }
+}
