@@ -1,32 +1,26 @@
-import { useEffect, useRef, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 
-// Fades/slides a section in the first time it scrolls into view.
-// Respects prefers-reduced-motion via the `.reveal` CSS rules in index.css.
-export default function Reveal({ children, delay = 0, className = '', as: Tag = 'div', ...rest }) {
-  const ref = useRef(null);
-  const [visible, setVisible] = useState(false);
+// Fades/slides a section in the first time it scrolls into view, via framer-motion.
+// Respects prefers-reduced-motion (skips the animation, renders in its final state).
+export default function Reveal({ children, delay = 0, className = '', as = 'div', ...rest }) {
+  const MotionTag = motion[as];
+  const reduceMotion = useReducedMotion();
 
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setVisible(true);
-        observer.disconnect();
-      }
-    }, { threshold: 0.15 });
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
+  if (reduceMotion) {
+    const Tag = as;
+    return <Tag className={className} {...rest}>{children}</Tag>;
+  }
 
   return (
-    <Tag
-      ref={ref}
-      className={`reveal ${visible ? 'is-visible' : ''} ${className}`}
-      style={{ transitionDelay: visible ? `${delay}ms` : '0ms' }}
+    <MotionTag
+      className={className}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{ duration: 0.6, delay: delay / 1000, ease: [0.16, 1, 0.3, 1] }}
       {...rest}
     >
       {children}
-    </Tag>
+    </MotionTag>
   );
 }

@@ -174,24 +174,6 @@ textarea:focus {
   }
 }
 
-/* Scroll reveal (see components/Reveal.jsx) */
-.reveal {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.reveal.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-@media (prefers-reduced-motion: reduce) {
-  .reveal {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-}
-
 /* Hero gradient — #1E1B4B a #4F46E5 con patrón sutil de puntos aplicado inline donde se usa */
 .hero-gradient {
   background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #3730a3 70%, #4f46e5 100%);

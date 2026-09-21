@@ -25,6 +25,9 @@ backend/uploads/resumes/*
 *.log
 npm-debug.log*
 
+# Claude Code local tooling (skills, local settings) — not project source
+.claude/
+
 # OS/Editor
 .DS_Store
 .vscode/*

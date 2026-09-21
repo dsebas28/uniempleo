@@ -11,8 +11,42 @@ import { jobsAPI } from '../services/api';
 import JobCard from '../components/JobCard';
 import Reveal from '../components/Reveal';
 import { COLOMBIA_CITIES } from '../data/colombia';
+import { motion, useReducedMotion } from 'framer-motion';
 
 const HERO_MODALITIES = ['Remoto', 'Híbrido', 'Presencial'];
+
+const heroStagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12, delayChildren: 0.05 } },
+};
+const heroItem = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } },
+};
+
+// Un chip flotante que respira suavemente en un loop infinito (se desactiva con
+// prefers-reduced-motion). `delay` desincroniza cada chip para que no floten al unísono.
+function FloatingChip({ className, rotate, delay = 0, children }) {
+  const reduceMotion = useReducedMotion();
+  return (
+    <motion.div
+      className={className}
+      style={{ rotate }}
+      initial={{ opacity: 0, y: 12, scale: 0.9 }}
+      animate={reduceMotion ? { opacity: 1, y: 0, scale: 1 } : {
+        opacity: 1, scale: 1,
+        y: [0, -8, 0],
+      }}
+      transition={reduceMotion ? { duration: 0.4, delay } : {
+        opacity: { duration: 0.4, delay },
+        scale: { duration: 0.4, delay },
+        y: { duration: 3.2, repeat: Infinity, ease: 'easeInOut', delay: delay + 0.4 },
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
 // Mockup flotante del producto (en vez de foto de stock): una tarjeta de vacante
 // real con chips de prueba social alrededor, con el mismo espíritu que un hero
@@ -23,7 +57,13 @@ function HeroMockup() {
       <div className="absolute -inset-10 bg-accent-400/20 rounded-full blur-3xl" />
 
       {/* Tarjeta principal: mock de una oferta */}
-      <div className="relative bg-white rounded-3xl shadow-2xl shadow-brand-950/40 p-5 rotate-[-3deg] hover:rotate-0 transition-transform duration-500">
+      <motion.div
+        className="relative bg-white rounded-3xl shadow-2xl shadow-brand-950/40 p-5"
+        initial={{ opacity: 0, y: 24, rotate: -3 }}
+        animate={{ opacity: 1, y: 0, rotate: -3 }}
+        whileHover={{ rotate: 0 }}
+        transition={{ opacity: { duration: 0.6 }, y: { duration: 0.6 }, rotate: { duration: 0.4 } }}
+      >
         <div className="flex items-center gap-3 mb-4">
           <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-brand-100 to-brand-200 flex items-center justify-center text-brand-700 font-bold">T</div>
           <div className="flex-1 min-w-0">
@@ -38,14 +78,19 @@ function HeroMockup() {
           <span className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-brand-50 text-brand-700">Sin experiencia</span>
         </div>
         <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden mb-1.5">
-          <div className="h-full w-[70%] progress-bar" />
+          <motion.div
+            className="h-full progress-bar"
+            initial={{ width: 0 }}
+            animate={{ width: '70%' }}
+            transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          />
         </div>
         <p className="text-[11px] text-slate-400 mb-4">Match con tu perfil: 70%</p>
         <div className="py-2.5 text-center text-sm font-bold text-white rounded-xl btn-accent">Postularme</div>
-      </div>
+      </motion.div>
 
       {/* Chip flotante: contratación */}
-      <div className="absolute -top-5 -right-4 sm:-right-8 bg-white rounded-2xl shadow-xl p-3 flex items-center gap-2 rotate-[4deg] animate-fade-in-up">
+      <FloatingChip className="absolute -top-5 -right-4 sm:-right-8 bg-white rounded-2xl shadow-xl p-3 flex items-center gap-2" rotate={4} delay={0.5}>
         <div className="w-8 h-8 rounded-full bg-accent-100 flex items-center justify-center flex-shrink-0">
           <CheckCircle2 size={16} className="text-accent-600" />
         </div>
@@ -53,10 +98,10 @@ function HeroMockup() {
           <p className="text-xs font-bold text-slate-900 leading-tight">¡Contratado!</p>
           <p className="text-[10px] text-slate-400">Hace 2 días</p>
         </div>
-      </div>
+      </FloatingChip>
 
       {/* Chip flotante: comunidad */}
-      <div className="absolute -bottom-6 -left-4 sm:-left-8 bg-white rounded-2xl shadow-xl p-3 flex items-center gap-2.5 rotate-[-2deg]">
+      <FloatingChip className="absolute -bottom-6 -left-4 sm:-left-8 bg-white rounded-2xl shadow-xl p-3 flex items-center gap-2.5" rotate={-2} delay={0.7}>
         <div className="flex -space-x-2 flex-shrink-0">
           {['bg-brand-400', 'bg-accent-400', 'bg-amber-400'].map((c, i) => (
             <div key={i} className={`w-7 h-7 rounded-full ${c} border-2 border-white`} />
@@ -66,13 +111,13 @@ function HeroMockup() {
           <p className="text-xs font-bold text-slate-900 leading-tight">+20 estudiantes</p>
           <p className="text-[10px] text-slate-400">activos esta semana</p>
         </div>
-      </div>
+      </FloatingChip>
 
       {/* Chip flotante: crecimiento */}
-      <div className="hidden sm:flex absolute top-1/3 -right-10 bg-white rounded-2xl shadow-xl p-2.5 items-center gap-1.5 rotate-[3deg]">
+      <FloatingChip className="hidden sm:flex absolute top-1/3 -right-10 bg-white rounded-2xl shadow-xl p-2.5 items-center gap-1.5" rotate={3} delay={0.9}>
         <TrendingUp size={15} className="text-accent-500" />
         <span className="text-xs font-bold text-slate-900">+30 vacantes</span>
-      </div>
+      </FloatingChip>
     </div>
   );
 }
@@ -216,21 +261,26 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center mb-10 lg:mb-14">
             {/* Left: copy */}
-            <div className="text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-brand-100 text-xs font-semibold mb-6 backdrop-blur-md">
+            <motion.div
+              className="text-center lg:text-left"
+              variants={heroStagger}
+              initial="hidden"
+              animate="show"
+            >
+              <motion.div variants={heroItem} className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-brand-100 text-xs font-semibold mb-6 backdrop-blur-md">
                 <Zap size={13} className="text-accent-400" />
                 <span>Hecho para estudiantes y recién egresados sin experiencia</span>
-              </div>
+              </motion.div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-[2.75rem] font-extrabold text-white leading-[1.15] mb-4 tracking-tight" style={{ fontFamily: 'Plus Jakarta Sans' }}>
+              <motion.h1 variants={heroItem} className="text-3xl sm:text-4xl md:text-[2.75rem] font-extrabold text-white leading-[1.15] mb-4 tracking-tight" style={{ fontFamily: 'Plus Jakarta Sans' }}>
                 Tu primera oportunidad profesional{' '}
                 <span className="text-accent-400">comienza aquí</span>
-              </h1>
+              </motion.h1>
 
-              <p className="text-base text-brand-100/80 leading-relaxed max-w-xl mx-auto lg:mx-0">
+              <motion.p variants={heroItem} className="text-base text-brand-100/80 leading-relaxed max-w-xl mx-auto lg:mx-0">
                 Conectamos tu talento universitario con empresas que valoran el potencial de aprendizaje. Sin experiencia requerida, sin barreras.
-              </p>
-            </div>
+              </motion.p>
+            </motion.div>
 
             {/* Right: product mockup (equivalente a la foto grande) */}
             <div className="hidden lg:block">
@@ -239,7 +289,12 @@ export default function Home() {
           </div>
 
           {/* Search bar — pill segmentado, a todo el ancho del hero */}
-          <div className="max-w-4xl mx-auto">
+          <motion.div
+            className="max-w-4xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          >
             <form onSubmit={handleSearch}>
               <div className="flex flex-col sm:flex-row bg-white rounded-3xl sm:rounded-full shadow-2xl shadow-brand-950/30 p-2.5 gap-1.5 sm:gap-0">
                 <div className="flex-1 flex items-center gap-3 px-6 py-4 sm:border-r border-slate-100 rounded-full min-w-0">
@@ -307,7 +362,7 @@ export default function Home() {
                 </button>
               ))}
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
