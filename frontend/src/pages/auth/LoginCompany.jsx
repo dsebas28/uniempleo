@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { motion, useAnimation, useReducedMotion, AnimatePresence } from 'framer-motion';
 import {
   Building2, Mail, Lock, Eye, EyeOff, ArrowRight, ChevronLeft,
-  Loader2, AlertCircle, TrendingUp, Users, Clock, BadgeCheck, ShieldCheck, GraduationCap
+  Loader2, AlertCircle, TrendingUp, Users, Clock, BadgeCheck, ShieldCheck, GraduationCap, Check
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Logo from '../../components/Logo';
+import FloatingInput from '../../components/ui/FloatingInput';
+import { StaggerContainer, FadeIn } from '../../components/animations';
+import RoleTabSwitcher from './RoleTabSwitcher';
 import toast from 'react-hot-toast';
 
 const REMEMBER_KEY = 'uniempleo_remember_company_email';
@@ -15,6 +19,8 @@ export default function LoginCompany() {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname;
+  const reduceMotion = useReducedMotion();
+  const shakeControls = useAnimation();
 
   const [email, setEmail] = useState(() => localStorage.getItem(REMEMBER_KEY) || '');
   const [password, setPassword] = useState('');
@@ -22,6 +28,12 @@ export default function LoginCompany() {
   const [remember, setRemember] = useState(() => !!localStorage.getItem(REMEMBER_KEY));
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState('');
+  const [success, setSuccess] = useState(false);
+
+  const triggerShake = () => {
+    if (reduceMotion) return;
+    shakeControls.start({ x: [0, -10, 10, -8, 8, -4, 4, 0], transition: { duration: 0.5, ease: 'easeInOut' } });
+  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -37,26 +49,31 @@ export default function LoginCompany() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setServerError('');
-    if (!validateForm()) return;
+    if (!validateForm()) { triggerShake(); return; }
 
     const result = await login(email.trim(), password);
     if (!result.success) {
       setServerError(result.error || 'Correo o contraseña incorrectos.');
       toast.error(result.error || 'Error al iniciar sesión');
+      triggerShake();
       return;
     }
 
     if (result.user.role !== 'company') {
       logout();
       setServerError('Esta cuenta no es de empresa. Usa el portal correspondiente para ingresar.');
+      triggerShake();
       return;
     }
 
     if (remember) localStorage.setItem(REMEMBER_KEY, email.trim());
     else localStorage.removeItem(REMEMBER_KEY);
 
+    setSuccess(true);
     toast.success(`¡Bienvenido, ${result.user.profile?.name || result.user.profile?.companyName || result.user.email}!`);
-    navigate(from && from !== '/login' ? from : '/empresa/dashboard', { replace: true });
+    setTimeout(() => {
+      navigate(from && from !== '/login' ? from : '/empresa/dashboard', { replace: true });
+    }, 550);
   };
 
   const autofillDemo = () => {
@@ -74,20 +91,26 @@ export default function LoginCompany() {
           backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)',
           backgroundSize: '32px 32px'
         }} />
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-accent-500/15 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 -right-20 w-80 h-80 bg-accent-500/10 rounded-full blur-3xl" />
+        <motion.div
+          className="absolute -top-24 -left-24 w-96 h-96 bg-accent-500/15 rounded-full blur-3xl"
+          animate={reduceMotion ? {} : { scale: [1, 1.15, 1], opacity: [0.15, 0.28, 0.15] }}
+          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className="absolute bottom-0 -right-20 w-80 h-80 bg-accent-500/10 rounded-full blur-3xl"
+          animate={reduceMotion ? {} : { scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+        />
 
         <div className="relative z-10 flex flex-col justify-between p-12 text-white w-full">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <Link to="/" className="w-fit">
               <Logo size={30} variant="light" />
             </Link>
-            <Link to="/login" className="inline-flex items-center gap-2 text-slate-300 hover:text-white text-sm font-semibold transition-colors w-fit">
-              <ChevronLeft className="w-4 h-4" /> Volver a portales
-            </Link>
+            <RoleTabSwitcher active="company" variant="dark" />
           </div>
 
-          <div>
+          <FadeIn direction="up" trigger="mount">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-xs font-semibold mb-6">
               <Building2 className="w-3.5 h-3.5 text-accent-300" />
               Portal Empresa
@@ -113,24 +136,27 @@ export default function LoginCompany() {
                 </div>
               ))}
             </div>
-          </div>
+          </FadeIn>
 
-          <div className="flex items-center gap-2.5 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4">
+          <FadeIn direction="up" delay={0.15} trigger="mount" className="flex items-center gap-2.5 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4">
             <BadgeCheck className="w-5 h-5 text-accent-300 flex-shrink-0" />
             <p className="text-xs text-slate-300 leading-relaxed">
               Empresas verificadas por nuestro equipo antes de publicar vacantes.
             </p>
-          </div>
+          </FadeIn>
         </div>
       </div>
 
       {/* Form panel */}
       <div className="flex-1 flex items-center justify-center p-6 sm:p-10 relative">
-        <div className="w-full max-w-sm">
-          <div className="lg:hidden flex items-center justify-between mb-6">
+        <motion.div animate={shakeControls} className="w-full max-w-sm">
+          <div className="lg:hidden flex items-center justify-between mb-6 gap-3">
             <Link to="/"><Logo size={30} /></Link>
-            <Link to="/login" className="inline-flex items-center gap-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 text-sm font-semibold transition-colors">
-              <ChevronLeft className="w-4 h-4" /> Portales
+            <RoleTabSwitcher active="company" />
+          </div>
+          <div className="hidden lg:flex justify-end mb-6">
+            <Link to="/login" className="inline-flex items-center gap-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 text-xs font-semibold transition-colors">
+              <ChevronLeft className="w-3.5 h-3.5" /> Volver a portales
             </Link>
           </div>
 
@@ -146,67 +172,57 @@ export default function LoginCompany() {
             </p>
           </div>
 
-          {serverError && (
-            <div className="mb-5 p-3.5 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-2xl flex items-start gap-2.5 text-rose-800 dark:text-rose-300 text-xs leading-relaxed">
-              <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 flex-shrink-0 mt-0.5" />
-              <div>{serverError}</div>
-            </div>
-          )}
+          <AnimatePresence>
+            {serverError && (
+              <motion.div
+                initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+                animate={{ opacity: 1, height: 'auto', marginBottom: 20 }}
+                exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                transition={{ duration: 0.25 }}
+                className="p-3.5 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-2xl flex items-start gap-2.5 text-rose-800 dark:text-rose-300 text-xs leading-relaxed overflow-hidden"
+              >
+                <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 flex-shrink-0 mt-0.5" />
+                <div>{serverError}</div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          <form onSubmit={handleSubmit} noValidate className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
-                Correo corporativo
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                  <Mail className="w-4 h-4" />
-                </div>
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="talento@empresa.com"
-                  value={email}
-                  style={{ paddingLeft: '2.75rem' }}
-                  onChange={(e) => { setEmail(e.target.value); if (errors.email) setErrors(p => ({ ...p, email: '' })); if (serverError) setServerError(''); }}
-                  className={`w-full py-2.5 pr-4 text-sm rounded-xl border transition-all ${
-                    errors.email ? 'border-rose-400 bg-rose-50/40 focus:ring-4 focus:ring-rose-500/10' : 'border-slate-300 hover:border-slate-400 focus:border-accent-600 focus:ring-4 focus:ring-accent-500/10'
-                  }`}
-                />
-              </div>
-              {errors.email && <p className="text-xs text-rose-600 dark:text-rose-400 mt-1.5 font-medium">{errors.email}</p>}
-            </div>
+          <StaggerContainer as="form" onSubmit={handleSubmit} noValidate className="space-y-4" staggerDelay={0.08}>
+            <StaggerContainer.Item>
+              <FloatingInput
+                id="email"
+                type="email"
+                label="Correo corporativo"
+                icon={Mail}
+                autoComplete="email"
+                value={email}
+                error={errors.email}
+                onChange={(e) => { setEmail(e.target.value); if (errors.email) setErrors(p => ({ ...p, email: '' })); if (serverError) setServerError(''); }}
+              />
+            </StaggerContainer.Item>
 
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label htmlFor="password" className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Contraseña</label>
+            <StaggerContainer.Item>
+              <div className="flex items-center justify-end mb-1">
                 <a href="#" className="text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-semibold hover:underline">¿Olvidaste tu contraseña?</a>
               </div>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                  <Lock className="w-4 h-4" />
-                </div>
-                <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="current-password"
-                  placeholder="••••••••"
-                  value={password}
-                  style={{ paddingLeft: '2.75rem', paddingRight: '2.75rem' }}
-                  onChange={(e) => { setPassword(e.target.value); if (errors.password) setErrors(p => ({ ...p, password: '' })); if (serverError) setServerError(''); }}
-                  className={`w-full py-2.5 text-sm rounded-xl border transition-all ${
-                    errors.password ? 'border-rose-400 bg-rose-50/40 focus:ring-4 focus:ring-rose-500/10' : 'border-slate-300 hover:border-slate-400 focus:border-accent-600 focus:ring-4 focus:ring-accent-500/10'
-                  }`}
-                />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'} className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer">
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-              {errors.password && <p className="text-xs text-rose-600 dark:text-rose-400 mt-1.5 font-medium">{errors.password}</p>}
-            </div>
+              <FloatingInput
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                label="Contraseña"
+                icon={Lock}
+                autoComplete="current-password"
+                value={password}
+                error={errors.password}
+                onChange={(e) => { setPassword(e.target.value); if (errors.password) setErrors(p => ({ ...p, password: '' })); if (serverError) setServerError(''); }}
+                rightElement={
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer">
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                }
+              />
+            </StaggerContainer.Item>
 
-            <label htmlFor="remember" className="flex items-center gap-2.5 cursor-pointer select-none">
+            <StaggerContainer.Item as="label" htmlFor="remember" className="flex items-center gap-2.5 cursor-pointer select-none">
               <input
                 id="remember"
                 type="checkbox"
@@ -215,16 +231,34 @@ export default function LoginCompany() {
                 className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-accent-600 focus:ring-2 focus:ring-accent-500/30 cursor-pointer"
               />
               <span className="text-xs font-medium text-slate-600 dark:text-slate-300">Recordar mi correo en este dispositivo</span>
-            </label>
+            </StaggerContainer.Item>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 text-sm font-bold rounded-xl btn-accent shadow-md flex items-center justify-center gap-2 disabled:opacity-60"
-            >
-              {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Iniciando sesión...</> : <>Iniciar sesión <ArrowRight className="w-4 h-4" /></>}
-            </button>
-          </form>
+            <StaggerContainer.Item>
+              <motion.button
+                type="submit"
+                disabled={loading || success}
+                whileHover={!loading && !success ? { scale: 1.015 } : {}}
+                whileTap={!loading && !success ? { scale: 0.98 } : {}}
+                className="w-full py-3 px-4 text-sm font-bold rounded-xl btn-accent shadow-md flex items-center justify-center gap-2 disabled:opacity-90 cursor-pointer"
+              >
+                <AnimatePresence mode="wait" initial={false}>
+                  {success ? (
+                    <motion.span key="success" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-2">
+                      <Check className="w-4 h-4" /> ¡Listo!
+                    </motion.span>
+                  ) : loading ? (
+                    <motion.span key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" /> Iniciando sesión...
+                    </motion.span>
+                  ) : (
+                    <motion.span key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
+                      Iniciar sesión <ArrowRight className="w-4 h-4" />
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </motion.button>
+            </StaggerContainer.Item>
+          </StaggerContainer>
 
           <button
             type="button"
@@ -239,16 +273,8 @@ export default function LoginCompany() {
               ¿Tu empresa aún no tiene cuenta?{' '}
               <Link to="/registro" className="text-slate-800 dark:text-white font-bold hover:underline">Regístrala gratis</Link>
             </p>
-            <div className="flex items-center justify-center gap-4 text-[11px] text-slate-400 dark:text-slate-500">
-              <Link to="/login/estudiante" className="inline-flex items-center gap-1 hover:text-brand-700 dark:hover:text-brand-300 font-medium transition-colors">
-                <GraduationCap className="w-3 h-3" /> Soy estudiante
-              </Link>
-              <Link to="/login/admin" className="inline-flex items-center gap-1 hover:text-slate-700 dark:hover:text-slate-300 font-medium transition-colors">
-                <ShieldCheck className="w-3 h-3" /> Soy administrador
-              </Link>
-            </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
