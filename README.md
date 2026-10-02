@@ -2,6 +2,15 @@
 
 > **UniEmpleo** conecta a estudiantes universitarios y recién graduados con empresas comprometidas a brindar oportunidades de prácticas profesionales, pasantías y primeras experiencias laborales en Colombia y Latinoamérica.
 
+![Inicio de UniEmpleo](docs/screenshots/01-inicio.png)
+
+## 📚 Documentación
+
+| Documento | Contenido |
+|---|---|
+| [**Guía del código**](docs/GUIA-DEL-CODIGO.md) | Cómo está construido el backend y el frontend: capas, conexión a PostgreSQL, autenticación, transacciones, alertas y pruebas, con fragmentos del código explicados |
+| [**Base de datos (PostgreSQL)**](docs/BASE-DE-DATOS.md) | Modelo de datos, diagramas entidad-relación, decisiones de diseño, la migración desde SQLite y 10 consultas con su resultado real |
+
 ---
 
 ## 🚀 Arquitectura Tecnológica
@@ -17,10 +26,45 @@ La plataforma está diseñada con una arquitectura desacoplada full-stack:
 - **Notificaciones**: React Hot Toast
 
 ### Backend
-- **Entorno**: Node.js + Express 4
-- **Base de Datos**: SQLite nativo con motor de alto rendimiento `better-sqlite3` y modo WAL activado
+- **Entorno**: Node.js + Express 4, organizado en rutas → controladores → servicios → modelos
+- **Base de Datos**: **PostgreSQL** con el driver `pg` y un pool de conexiones; consultas parametrizadas, transacciones y restricciones `CHECK` / `UNIQUE` en la base
 - **Seguridad**: Autenticación mediante JWT (JSON Web Tokens) y cifrado de contraseñas con `bcryptjs`
+- **Pruebas**: prueba de punta a punta de toda la API con `node:test` (`npm test`)
 - **CORS & Proxy**: Configuración completa con proxy inverso en Vite (`/api` → `http://localhost:5000`)
+
+---
+
+## 🖼️ Capturas
+
+| | |
+|---|---|
+| ![Empleos](docs/screenshots/02-empleos.png) | ![Detalle de vacante](docs/screenshots/03-detalle-vacante.png) |
+| **Buscador de empleos** con filtros | **Detalle de la vacante** y postulación |
+| ![Panel del estudiante](docs/screenshots/07-estudiante-panel.png) | ![Perfil del estudiante](docs/screenshots/08-estudiante-perfil.png) |
+| **Panel del estudiante**: postulaciones por mes y por estado | **Perfil profesional** con su porcentaje de completitud |
+| ![Postulaciones](docs/screenshots/09-estudiante-postulaciones.png) | ![Hoja de vida](docs/screenshots/10-estudiante-hoja-de-vida.png) |
+| **Seguimiento de postulaciones** | **Hoja de vida** generada desde el perfil |
+| ![Panel de la empresa](docs/screenshots/11-empresa-panel.png) | ![Candidatos](docs/screenshots/12-empresa-candidatos.png) |
+| **Panel de la empresa** | **Gestión de candidatos** y etapas del proceso |
+| ![Nueva vacante](docs/screenshots/13-empresa-nueva-vacante.png) | ![Panel de administración](docs/screenshots/14-admin-panel.png) |
+| **Publicación de vacantes** en 4 pasos | **Panel de administración** |
+| ![Reportes](docs/screenshots/15-admin-reportes.png) | ![Usuarios](docs/screenshots/16-admin-usuarios.png) |
+| **Reportes** de demanda laboral | **Gestión de usuarios** |
+| ![Empresas](docs/screenshots/04-empresas.png) | ![Academy](docs/screenshots/05-cursos.png) |
+| **Directorio de empresas** | **UniEmpleo Academy** |
+
+---
+
+## 🗄️ Base de Datos
+
+PostgreSQL con 21 tablas, claves foráneas con borrado en cascada, restricciones que rechazan datos imposibles (por ejemplo, un salario mínimo mayor que el máximo) e índices pensados para las consultas reales de la aplicación. Detalle completo en [docs/BASE-DE-DATOS.md](docs/BASE-DE-DATOS.md).
+
+| | |
+|---|---|
+| ![Modelo de vacantes y postulaciones](docs/database/images/er-empleo.png) | ![Vacantes afines](docs/database/images/05-vacantes-afines-a-un-estudiante.png) |
+| **Modelo entidad-relación** de vacantes y postulaciones | **Vacantes afines** a las habilidades de un estudiante (intersección de arreglos) |
+| ![Oferta y demanda de habilidades](docs/database/images/04-oferta-y-demanda-de-habilidades.png) | ![Restricción de salario](docs/database/images/08-restriccion-salario.png) |
+| **Habilidades**: lo que piden las empresas frente a lo que tienen los estudiantes | PostgreSQL **rechaza** un rango salarial invertido |
 
 ---
 
@@ -38,44 +82,46 @@ La base de datos viene precargada con datos realistas para probar todos los fluj
 
 ---
 
-## ⚡ Inicio Automatizado (En 1 Clic o 1 Comando)
+## 🛠️ Puesta en Marcha
 
-Puedes levantar tanto el Backend como el Frontend y abrir el navegador automáticamente de cualquiera de estas formas:
+### Requisitos
+- Node.js 20+
+- PostgreSQL 14+ (local o con Docker)
 
-- **Doble clic en Windows**: Ejecuta el archivo [`iniciar-uniempleo.bat`](file:///c:/Users/dseba_ow/Desktop/pagina%20de%20empleo%20universitario/iniciar-uniempleo.bat) ubicado en la raíz del proyecto.
-- **Desde la terminal raíz**:
-  ```bash
-  npm start
-  ```
-- **Con PowerShell**:
-  ```powershell
-  ./iniciar.ps1
-  ```
+### 1. Base de datos
 
----
+Con Docker (incluido en el repositorio):
 
-## 🛠️ Inicio Manual (Paso a Paso)
+```bash
+docker compose up -d
+```
 
-### 1. Iniciar el Backend
+O con un PostgreSQL instalado, creando el usuario y la base:
 
-Abre una terminal en la carpeta raíz del proyecto:
+```sql
+CREATE ROLE uniempleo LOGIN PASSWORD 'uniempleo';
+CREATE DATABASE uniempleo OWNER uniempleo;
+```
+
+### 2. Backend
 
 ```bash
 cd backend
+cp .env.example .env      # revisa DATABASE_URL y cambia JWT_SECRET
 npm install
-npm run dev
+npm run dev               # crea las tablas y carga la demo la primera vez
 ```
 
-> El servidor iniciará en `http://localhost:5000`. La base de datos SQLite se inicializa y se ubica automáticamente en `backend/data/uniempleo.db`.
+> El servidor iniciará en `http://localhost:5000`. Las tablas se crean solas al arrancar (`schema.sql`) y, si la base está vacía, se cargan los datos de demostración.
 
-*(Opcional) Si deseas reiniciar o regenerar los datos de prueba:*
-```bash
-node src/database/seed.js
-```
+Scripts útiles del backend:
 
-### 2. Iniciar el Frontend
+| Script | Qué hace |
+|---|---|
+| `npm run seed` | Crea las tablas si faltan y carga los datos de demostración |
+| `npm test` | Prueba de punta a punta de toda la API (con el backend en marcha) |
 
-Abre otra terminal en la carpeta raíz del proyecto:
+### 3. Frontend
 
 ```bash
 cd frontend
@@ -84,6 +130,14 @@ npm run dev
 ```
 
 > La aplicación web estará disponible en `http://localhost:5173`.
+
+### Inicio automatizado
+
+Con la base de datos ya levantada, puedes iniciar backend y frontend a la vez y abrir el navegador:
+
+- **Doble clic en Windows**: `iniciar-uniempleo.bat`
+- **Desde la terminal raíz**: `npm start`
+- **Con PowerShell**: `./iniciar.ps1`
 
 ---
 

@@ -1,0 +1,73 @@
+erDiagram
+    users {
+        integer id PK
+        varchar email
+        text password
+        varchar role
+    }
+    students {
+        integer id PK
+        integer user_id FK
+        text full_name
+        text university
+        text career
+    }
+    companies {
+        integer id PK
+        integer user_id FK
+        text name
+        varchar nit
+        text phone
+    }
+    admin_users {
+        integer id PK
+        integer user_id FK
+        text full_name
+    }
+    student_skills {
+        integer id PK
+        integer student_id FK
+        integer skill_id FK
+        text level
+    }
+    skills {
+        integer id PK
+        text name
+        text category
+    }
+    student_languages {
+        integer id PK
+        integer student_id FK
+        text language
+        text level
+    }
+    educations {
+        integer id PK
+        integer student_id FK
+        text institution
+        text degree
+        text field
+    }
+    experiences {
+        integer id PK
+        integer student_id FK
+        text company
+        text position
+        varchar start_date
+    }
+    projects {
+        integer id PK
+        integer student_id FK
+        text name
+        text description
+        text technologies
+    }
+    users ||--o{ students : "user_id"
+    users ||--o{ companies : "user_id"
+    users ||--o{ admin_users : "user_id"
+    students ||--o{ student_skills : "student_id"
+    skills ||--o{ student_skills : "skill_id"
+    students ||--o{ student_languages : "student_id"
+    students ||--o{ educations : "student_id"
+    students ||--o{ experiences : "student_id"
+    students ||--o{ projects : "student_id"

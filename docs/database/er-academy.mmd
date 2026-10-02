@@ -1,0 +1,43 @@
+erDiagram
+    courses {
+        integer id PK
+        text title
+        text description
+        smallint duration_hours
+        varchar level
+    }
+    course_modules {
+        integer id PK
+        integer course_id FK
+        text title
+        text description
+        smallint duration_minutes
+        smallint order_index
+    }
+    enrollments {
+        integer id PK
+        integer student_id FK
+        integer course_id FK
+        smallint progress
+        boolean completed
+        timestamp enrolled_at
+        timestamp completed_at
+    }
+    students {
+        integer id PK
+        integer user_id FK
+        text full_name
+        text university
+        text career
+        smallint semester
+    }
+    favorites {
+        integer id PK
+        integer student_id FK
+        varchar item_type
+        integer item_id
+    }
+    courses ||--o{ course_modules : "course_id"
+    courses ||--o{ enrollments : "course_id"
+    students ||--o{ enrollments : "student_id"
+    students ||--o{ favorites : "student_id"

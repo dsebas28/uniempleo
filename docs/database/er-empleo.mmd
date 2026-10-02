@@ -1,0 +1,85 @@
+erDiagram
+    companies {
+        integer id PK
+        integer user_id FK
+        text name
+        varchar nit
+        text phone
+    }
+    jobs {
+        integer id PK
+        integer company_id FK
+        text title
+        text description
+        text responsibilities
+    }
+    applications {
+        integer id PK
+        integer student_id FK
+        integer job_id FK
+        varchar status
+        text cover_letter
+        timestamp applied_at
+    }
+    interviews {
+        integer id PK
+        integer application_id FK
+        timestamp scheduled_at
+        text notes
+        varchar status
+    }
+    saved_jobs {
+        integer id PK
+        integer student_id FK
+        integer job_id FK
+        timestamp saved_at
+    }
+    students {
+        integer id PK
+        integer user_id FK
+        text full_name
+        text university
+        text career
+    }
+    job_alerts {
+        integer id PK
+        integer student_id FK
+        text area
+        text city
+        text modality
+    }
+    email_log {
+        integer id PK
+        integer student_id FK
+        integer job_id FK
+        integer alert_id FK
+        text to_email
+        text subject
+        text body
+    }
+    notifications {
+        integer id PK
+        integer user_id FK
+        text title
+        text message
+        varchar type
+    }
+    users {
+        integer id PK
+        varchar email
+        text password
+        varchar role
+    }
+    users ||--o{ students : "user_id"
+    users ||--o{ companies : "user_id"
+    companies ||--o{ jobs : "company_id"
+    jobs ||--o{ applications : "job_id"
+    students ||--o{ applications : "student_id"
+    jobs ||--o{ saved_jobs : "job_id"
+    students ||--o{ saved_jobs : "student_id"
+    users ||--o{ notifications : "user_id"
+    applications ||--o{ interviews : "application_id"
+    students ||--o{ job_alerts : "student_id"
+    job_alerts ||--o{ email_log : "alert_id"
+    jobs ||--o{ email_log : "job_id"
+    students ||--o{ email_log : "student_id"
