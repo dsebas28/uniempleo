@@ -1,7 +1,9 @@
 const { getDb } = require('../database/db');
 
+const isTrue = (v) => v === 'true' || v === true || v === '1' || v === 1;
+
 const jobModel = {
-  getAll({ keyword, city, modality, area, isInternship, noExperience, minSalary, maxSalary, page = 1, limit = 12 } = {}) {
+  async getAll({ keyword, city, modality, area, isInternship, noExperience, minSalary, maxSalary, page = 1, limit = 12 } = {}) {
     const db = getDb();
     let query = `
       SELECT j.*, c.name as company_name, c.logo as company_logo, c.sector as company_sector
@@ -12,7 +14,8 @@ const jobModel = {
     const params = [];
 
     if (keyword) {
-      query += ` AND (j.title LIKE ? OR j.description LIKE ? OR j.skills LIKE ? OR c.name LIKE ?)`;
+      // ILIKE: búsqueda sin distinguir mayúsculas, como hacía LIKE en SQLite
+      query += ` AND (j.title ILIKE ? OR j.description ILIKE ? OR j.skills ILIKE ? OR c.name ILIKE ?)`;
       const kw = `%${keyword}%`;
       params.push(kw, kw, kw, kw);
     }
@@ -30,11 +33,11 @@ const jobModel = {
     }
     if (isInternship !== undefined && isInternship !== '') {
       query += ` AND j.is_internship = ?`;
-      params.push(isInternship === 'true' || isInternship === true || isInternship === '1' ? 1 : 0);
+      params.push(isTrue(isInternship));
     }
     if (noExperience !== undefined && noExperience !== '') {
       query += ` AND j.no_experience_ok = ?`;
-      params.push(noExperience === 'true' || noExperience === true || noExperience === '1' ? 1 : 0);
+      params.push(isTrue(noExperience));
     }
     if (minSalary) {
       query += ` AND (j.salary_max >= ? OR j.salary_max IS NULL)`;
@@ -42,16 +45,16 @@ const jobModel = {
     }
 
     const countQuery = query.replace('SELECT j.*, c.name as company_name, c.logo as company_logo, c.sector as company_sector', 'SELECT COUNT(*) as count');
-    const total = db.prepare(countQuery).get(...params).count;
+    const total = (await db.prepare(countQuery).get(...params)).count;
 
     query += ` ORDER BY j.created_at DESC LIMIT ? OFFSET ?`;
     params.push(parseInt(limit), (parseInt(page) - 1) * parseInt(limit));
 
-    const jobs = db.prepare(query).all(...params);
+    const jobs = await db.prepare(query).all(...params);
     return { jobs, total, page: parseInt(page), pages: Math.ceil(total / parseInt(limit)) };
   },
 
-  getById(id) {
+  async getById(id) {
     const db = getDb();
     return db.prepare(`
       SELECT j.*, c.name as company_name, c.logo as company_logo, c.sector as company_sector,
@@ -62,28 +65,28 @@ const jobModel = {
     `).get(id);
   },
 
-  getByCompanyId(companyId) {
+  async getByCompanyId(companyId) {
     const db = getDb();
     return db.prepare(`
-      SELECT j.*, 
+      SELECT j.*,
              (SELECT COUNT(*) FROM applications a WHERE a.job_id = j.id) as application_count
-      FROM jobs j 
-      WHERE j.company_id = ? 
+      FROM jobs j
+      WHERE j.company_id = ?
       ORDER BY j.created_at DESC
     `).all(companyId);
   },
 
-  getAllAdmin() {
+  async getAllAdmin() {
     const db = getDb();
     return db.prepare(`
-      SELECT j.*, c.name as company_name 
-      FROM jobs j 
-      JOIN companies c ON j.company_id = c.id 
+      SELECT j.*, c.name as company_name
+      FROM jobs j
+      JOIN companies c ON j.company_id = c.id
       ORDER BY j.created_at DESC
     `).all();
   },
 
-  create(companyId, jobData) {
+  async create(companyId, jobData) {
     const db = getDb();
     const {
       title, description, responsibilities, requirements, skills, benefits,
@@ -91,23 +94,24 @@ const jobModel = {
       educationLevel, area, isInternship, noExperienceOk, deadline
     } = jobData;
 
-    const result = db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO jobs (
         company_id, title, description, responsibilities, requirements, skills,
         benefits, salary_min, salary_max, city, modality, contract_type,
         experience_years, education_level, area, is_internship, no_experience_ok, deadline
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      RETURNING id
     `).run(
       companyId, title, description, responsibilities || '', requirements || '', skills || '',
       benefits || '', salaryMin || null, salaryMax || null, city, modality, contractType,
-      experienceYears || 0, educationLevel || '', area, isInternship ? 1 : 0,
-      noExperienceOk ? 1 : 0, deadline || null
+      experienceYears || 0, educationLevel || '', area, !!isInternship,
+      !!noExperienceOk, deadline || null
     );
 
     return result.lastInsertRowid;
   },
 
-  update(jobId, companyId, jobData) {
+  async update(jobId, companyId, jobData) {
     const db = getDb();
     const {
       title, description, responsibilities, requirements, skills, benefits,
@@ -116,55 +120,57 @@ const jobModel = {
     } = jobData;
 
     return db.prepare(`
-      UPDATE jobs 
+      UPDATE jobs
       SET title = ?, description = ?, responsibilities = ?, requirements = ?, skills = ?,
           benefits = ?, salary_min = ?, salary_max = ?, city = ?, modality = ?,
           contract_type = ?, experience_years = ?, area = ?, is_internship = ?,
-          no_experience_ok = ?, deadline = ?, status = COALESCE(?, status), updated_at = datetime('now')
+          no_experience_ok = ?, deadline = ?, status = COALESCE(?, status), updated_at = LOCALTIMESTAMP(0)
       WHERE id = ? AND company_id = ?
     `).run(
       title, description, responsibilities, requirements, skills, benefits,
-      salaryMin, salaryMax, city, modality, contractType, experienceYears,
-      area, isInternship ? 1 : 0, noExperienceOk ? 1 : 0, deadline, status,
+      salaryMin || null, salaryMax || null, city, modality, contractType, experienceYears || 0,
+      area, !!isInternship, !!noExperienceOk, deadline || null, status || null,
       jobId, companyId
     );
   },
 
-  updateStatus(jobId, status) {
+  async updateStatus(jobId, status) {
     const db = getDb();
-    return db.prepare(`UPDATE jobs SET status = ?, updated_at = datetime('now') WHERE id = ?`).run(status, jobId);
+    return db.prepare(`UPDATE jobs SET status = ?, updated_at = LOCALTIMESTAMP(0) WHERE id = ?`).run(status, jobId);
   },
 
-  incrementApplicants(jobId) {
+  async incrementApplicants(jobId) {
     const db = getDb();
     return db.prepare(`UPDATE jobs SET applicants_count = applicants_count + 1 WHERE id = ?`).run(jobId);
   },
 
-  delete(jobId, companyId) {
+  async delete(jobId, companyId) {
     const db = getDb();
     return db.prepare('DELETE FROM jobs WHERE id = ? AND company_id = ?').run(jobId, companyId);
   },
 
-  getStats() {
+  // Cifras de la portada en una sola consulta
+  async getStats() {
     const db = getDb();
-    const students = db.prepare(`SELECT COUNT(*) as c FROM users WHERE role = 'student'`).get().c;
-    const companies = db.prepare(`SELECT COUNT(*) as c FROM companies WHERE approved = 1`).get().c;
-    const jobs = db.prepare(`SELECT COUNT(*) as c FROM jobs WHERE status = 'active'`).get().c;
-    const hired = db.prepare(`SELECT COUNT(*) as c FROM applications WHERE status = 'selected'`).get().c;
-    return { students, companies, jobs, hired };
+    return db.prepare(`
+      SELECT (SELECT COUNT(*) FROM users WHERE role = 'student')            AS students,
+             (SELECT COUNT(*) FROM companies WHERE approved)                AS companies,
+             (SELECT COUNT(*) FROM jobs WHERE status = 'active')            AS jobs,
+             (SELECT COUNT(*) FROM applications WHERE status = 'selected')  AS hired
+    `).get();
   },
 
-  getJobsByArea(limit = 8) {
+  async getJobsByArea(limit = 8) {
     const db = getDb();
     return db.prepare(`SELECT area, COUNT(*) as count FROM jobs GROUP BY area ORDER BY count DESC LIMIT ?`).all(limit);
   },
 
-  getJobsByCity(limit = 10) {
+  async getJobsByCity(limit = 10) {
     const db = getDb();
     return db.prepare(`SELECT city, COUNT(*) as count FROM jobs GROUP BY city ORDER BY count DESC LIMIT ?`).all(limit);
   },
 
-  getJobsByModality() {
+  async getJobsByModality() {
     const db = getDb();
     return db.prepare(`SELECT modality, COUNT(*) as count FROM jobs GROUP BY modality`).all();
   }

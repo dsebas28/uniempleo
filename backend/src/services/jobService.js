@@ -1,18 +1,18 @@
 const jobModel = require('../models/jobModel');
 
 const jobService = {
-  getAll(filters) {
-    return jobModel.getAll(filters);
+  async getAll(filters) {
+    return await jobModel.getAll(filters);
   },
 
-  getById(id) {
-    const job = jobModel.getById(id);
+  async getById(id) {
+    const job = await jobModel.getById(id);
     if (!job) throw new Error('Oferta de empleo no encontrada');
     return job;
   },
 
-  getStats() {
-    return jobModel.getStats();
+  async getStats() {
+    return await jobModel.getStats();
   }
 };
 

@@ -2,22 +2,23 @@ const { getDb } = require('../database/db');
 const studentModel = require('./studentModel');
 
 const applicationModel = {
-  create(jobId, studentId, coverLetter = '') {
+  async create(jobId, studentId, coverLetter = '') {
     const db = getDb();
-    const result = db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO applications (job_id, student_id, cover_letter, status)
       VALUES (?, ?, ?, 'sent')
+      RETURNING id
     `).run(jobId, studentId, coverLetter);
     return result.lastInsertRowid;
   },
 
-  hasApplied(jobId, studentId) {
+  async hasApplied(jobId, studentId) {
     const db = getDb();
-    const existing = db.prepare('SELECT id FROM applications WHERE job_id = ? AND student_id = ?').get(jobId, studentId);
+    const existing = await db.prepare('SELECT id FROM applications WHERE job_id = ? AND student_id = ?').get(jobId, studentId);
     return !!existing;
   },
 
-  findByStudentId(studentId) {
+  async findByStudentId(studentId) {
     const db = getDb();
     return db.prepare(`
       SELECT a.*, j.title as job_title, j.city, j.modality, j.contract_type, j.is_internship,
@@ -30,7 +31,7 @@ const applicationModel = {
     `).all(studentId);
   },
 
-  findByCompanyId(companyId, jobId = null) {
+  async findByCompanyId(companyId, jobId = null) {
     const db = getDb();
     let query = `
       SELECT a.*, s.full_name, s.career, s.university, s.city as student_city, s.english_level, s.profile_completion,
@@ -53,55 +54,77 @@ const applicationModel = {
     }
     query += ' ORDER BY a.applied_at DESC';
 
-    const candidates = db.prepare(query).all(...params);
+    const candidates = await db.prepare(query).all(...params);
 
-    return candidates.map(c => {
-      const skills = db.prepare(`
-        SELECT sk.name FROM student_skills ss
-        JOIN skills sk ON ss.skill_id = sk.id
-        WHERE ss.student_id = ?
-      `).all(c.student_id);
+    return Promise.all(candidates.map(async (c) => {
+      const [skills, educations, experiences, languages] = await Promise.all([
+        db.prepare(`
+          SELECT sk.name FROM student_skills ss
+          JOIN skills sk ON ss.skill_id = sk.id
+          WHERE ss.student_id = ?
+        `).all(c.student_id),
+        studentModel.getEducations(c.student_id),
+        studentModel.getExperiences(c.student_id),
+        studentModel.getLanguages(c.student_id),
+      ]);
       const matchPct = 65 + Math.floor(Math.random() * 35);
       return {
         ...c,
         skills: skills.map(s => s.name),
-        educations: studentModel.getEducations(c.student_id),
-        experiences: studentModel.getExperiences(c.student_id),
-        languages: studentModel.getLanguages(c.student_id),
+        educations,
+        experiences,
+        languages,
         matchPercentage: matchPct,
       };
-    });
+    }));
   },
 
-  findByIdAndCompany(applicationId, companyId) {
+  async findByIdAndCompany(applicationId, companyId) {
     const db = getDb();
     return db.prepare(`
       SELECT a.*, j.title as job_title, c.name as company_name
-      FROM applications a 
-      JOIN jobs j ON a.job_id = j.id 
+      FROM applications a
+      JOIN jobs j ON a.job_id = j.id
       JOIN companies c ON j.company_id = c.id
       WHERE a.id = ? AND j.company_id = ?
     `).get(applicationId, companyId);
   },
 
-  updateStatus(applicationId, status) {
+  async updateStatus(applicationId, status) {
     const db = getDb();
-    return db.prepare(`UPDATE applications SET status = ?, updated_at = datetime('now') WHERE id = ?`).run(status, applicationId);
+    return db.prepare(`UPDATE applications SET status = ?, updated_at = LOCALTIMESTAMP(0) WHERE id = ?`).run(status, applicationId);
   },
 
-  countByStatus() {
+  // Postulaciones del estudiante agrupadas por mes ('YYYY-MM') y por estado, para las gráficas de su panel
+  async countByMonthForStudent(studentId) {
+    const db = getDb();
+    return db.prepare(`
+      SELECT to_char(applied_at, 'YYYY-MM') AS month, COUNT(*) AS count
+      FROM applications
+      WHERE student_id = ?
+      GROUP BY month
+      ORDER BY month
+    `).all(studentId);
+  },
+
+  async countByStatusForStudent(studentId) {
+    const db = getDb();
+    return db.prepare(`SELECT status, COUNT(*) AS count FROM applications WHERE student_id = ? GROUP BY status`).all(studentId);
+  },
+
+  async countByStatus() {
     const db = getDb();
     return db.prepare(`SELECT status, COUNT(*) as count FROM applications GROUP BY status`).all();
   },
 
-  getTotalCount() {
+  async getTotalCount() {
     const db = getDb();
-    return db.prepare(`SELECT COUNT(*) as c FROM applications`).get().c;
+    return (await db.prepare(`SELECT COUNT(*) as c FROM applications`).get()).c;
   },
 
-  getHiredCount() {
+  async getHiredCount() {
     const db = getDb();
-    return db.prepare(`SELECT COUNT(*) as c FROM applications WHERE status = 'selected'`).get().c;
+    return (await db.prepare(`SELECT COUNT(*) as c FROM applications WHERE status = 'selected'`).get()).c;
   }
 };
 

@@ -1,36 +1,36 @@
 const studentService = require('../services/studentService');
 const applicationService = require('../services/applicationService');
 
-function getStudentProfile(req, res) {
+async function getStudentProfile(req, res) {
   try {
-    const profile = studentService.getProfile(req.user.id);
+    const profile = await studentService.getProfile(req.user.id);
     res.json(profile);
   } catch (err) {
     res.status(404).json({ error: err.message });
   }
 }
 
-function updateStudentProfile(req, res) {
+async function updateStudentProfile(req, res) {
   try {
-    const updated = studentService.updateProfile(req.user.id, req.body);
+    const updated = await studentService.updateProfile(req.user.id, req.body);
     res.json({ message: 'Perfil actualizado exitosamente', profile: updated });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function getDashboard(req, res) {
+async function getDashboard(req, res) {
   try {
-    const dashboardData = studentService.getDashboard(req.user.id);
+    const dashboardData = await studentService.getDashboard(req.user.id);
     res.json(dashboardData);
   } catch (err) {
     res.status(404).json({ error: err.message });
   }
 }
 
-function getApplications(req, res) {
+async function getApplications(req, res) {
   try {
-    const applications = applicationService.getStudentApplications(req.user.id);
+    const applications = await applicationService.getStudentApplications(req.user.id);
     res.json(applications);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -48,186 +48,186 @@ async function apply(req, res) {
   }
 }
 
-function getSavedJobs(req, res) {
+async function getSavedJobs(req, res) {
   try {
-    const saved = studentService.getSavedJobs(req.user.id);
+    const saved = await studentService.getSavedJobs(req.user.id);
     res.json(saved);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function saveJob(req, res) {
+async function saveJob(req, res) {
   try {
-    const result = studentService.saveJob(req.user.id, req.params.jobId);
+    const result = await studentService.saveJob(req.user.id, req.params.jobId);
     res.json(result);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function unsaveJob(req, res) {
+async function unsaveJob(req, res) {
   try {
-    const result = studentService.unsaveJob(req.user.id, req.params.jobId);
+    const result = await studentService.unsaveJob(req.user.id, req.params.jobId);
     res.json(result);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function getJobAlerts(req, res) {
+async function getJobAlerts(req, res) {
   try {
-    const alerts = studentService.getJobAlerts(req.user.id);
+    const alerts = await studentService.getJobAlerts(req.user.id);
     res.json(alerts);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function createJobAlert(req, res) {
+async function createJobAlert(req, res) {
   try {
-    const result = studentService.createJobAlert(req.user.id, req.body);
+    const result = await studentService.createJobAlert(req.user.id, req.body);
     res.status(201).json(result);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function toggleJobAlert(req, res) {
+async function toggleJobAlert(req, res) {
   try {
-    const result = studentService.toggleJobAlert(req.user.id, req.params.id, req.body.active);
+    const result = await studentService.toggleJobAlert(req.user.id, req.params.id, req.body.active);
     res.json(result);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function deleteJobAlert(req, res) {
+async function deleteJobAlert(req, res) {
   try {
-    const result = studentService.deleteJobAlert(req.user.id, req.params.id);
+    const result = await studentService.deleteJobAlert(req.user.id, req.params.id);
     res.json(result);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function uploadResume(req, res) {
+async function uploadResume(req, res) {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No se recibió ningún archivo. Adjunta tu hoja de vida en PDF.' });
     }
-    const profile = studentService.uploadResume(req.user.id, req.file);
+    const profile = await studentService.uploadResume(req.user.id, req.file);
     res.json({ message: 'Hoja de vida subida exitosamente', profile });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function deleteResume(req, res) {
+async function deleteResume(req, res) {
   try {
-    const profile = studentService.deleteResume(req.user.id);
+    const profile = await studentService.deleteResume(req.user.id);
     res.json({ message: 'Hoja de vida eliminada', profile });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function addEducation(req, res) {
+async function addEducation(req, res) {
   try {
-    const profile = studentService.addEducation(req.user.id, req.body);
+    const profile = await studentService.addEducation(req.user.id, req.body);
     res.status(201).json({ message: 'Educación agregada', profile });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function updateEducation(req, res) {
+async function updateEducation(req, res) {
   try {
-    const profile = studentService.updateEducation(req.user.id, req.params.id, req.body);
+    const profile = await studentService.updateEducation(req.user.id, req.params.id, req.body);
     res.json({ message: 'Educación actualizada', profile });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function deleteEducation(req, res) {
+async function deleteEducation(req, res) {
   try {
-    const profile = studentService.deleteEducation(req.user.id, req.params.id);
+    const profile = await studentService.deleteEducation(req.user.id, req.params.id);
     res.json({ message: 'Educación eliminada', profile });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function addExperience(req, res) {
+async function addExperience(req, res) {
   try {
-    const profile = studentService.addExperience(req.user.id, req.body);
+    const profile = await studentService.addExperience(req.user.id, req.body);
     res.status(201).json({ message: 'Experiencia agregada', profile });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function updateExperience(req, res) {
+async function updateExperience(req, res) {
   try {
-    const profile = studentService.updateExperience(req.user.id, req.params.id, req.body);
+    const profile = await studentService.updateExperience(req.user.id, req.params.id, req.body);
     res.json({ message: 'Experiencia actualizada', profile });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function deleteExperience(req, res) {
+async function deleteExperience(req, res) {
   try {
-    const profile = studentService.deleteExperience(req.user.id, req.params.id);
+    const profile = await studentService.deleteExperience(req.user.id, req.params.id);
     res.json({ message: 'Experiencia eliminada', profile });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function uploadPhoto(req, res) {
+async function uploadPhoto(req, res) {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No se recibió ninguna imagen.' });
     }
-    const profile = studentService.uploadPhoto(req.user.id, req.file);
+    const profile = await studentService.uploadPhoto(req.user.id, req.file);
     res.json({ message: 'Foto de perfil actualizada', profile });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function deletePhoto(req, res) {
+async function deletePhoto(req, res) {
   try {
-    const profile = studentService.deletePhoto(req.user.id);
+    const profile = await studentService.deletePhoto(req.user.id);
     res.json({ message: 'Foto de perfil eliminada', profile });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function addLanguage(req, res) {
+async function addLanguage(req, res) {
   try {
-    const profile = studentService.addLanguage(req.user.id, req.body);
+    const profile = await studentService.addLanguage(req.user.id, req.body);
     res.status(201).json({ message: 'Idioma agregado', profile });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function updateLanguage(req, res) {
+async function updateLanguage(req, res) {
   try {
-    const profile = studentService.updateLanguage(req.user.id, req.params.id, req.body);
+    const profile = await studentService.updateLanguage(req.user.id, req.params.id, req.body);
     res.json({ message: 'Idioma actualizado', profile });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function deleteLanguage(req, res) {
+async function deleteLanguage(req, res) {
   try {
-    const profile = studentService.deleteLanguage(req.user.id, req.params.id);
+    const profile = await studentService.deleteLanguage(req.user.id, req.params.id);
     res.json({ message: 'Idioma eliminado', profile });
   } catch (err) {
     res.status(400).json({ error: err.message });

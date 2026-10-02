@@ -1,22 +1,33 @@
-const { getDb } = require('../database/db');
+const notificationModel = require('../models/notificationModel');
 
-function getNotifications(req, res) {
-  const db = getDb();
-  const notifs = db.prepare('SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 30').all(req.user.id);
-  const unread = db.prepare('SELECT COUNT(*) as c FROM notifications WHERE user_id = ? AND read = 0').get(req.user.id).c;
-  res.json({ notifications: notifs, unread });
+async function getNotifications(req, res) {
+  try {
+    const [notifications, unread] = await Promise.all([
+      notificationModel.getByUserId(req.user.id, 30),
+      notificationModel.countUnread(req.user.id),
+    ]);
+    res.json({ notifications, unread });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 }
 
-function markAsRead(req, res) {
-  const db = getDb();
-  db.prepare('UPDATE notifications SET read = 1 WHERE id = ? AND user_id = ?').run(req.params.id, req.user.id);
-  res.json({ message: 'Notificación marcada como leída' });
+async function markAsRead(req, res) {
+  try {
+    await notificationModel.markAsRead(req.params.id, req.user.id);
+    res.json({ message: 'Notificación marcada como leída' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 }
 
-function markAllRead(req, res) {
-  const db = getDb();
-  db.prepare('UPDATE notifications SET read = 1 WHERE user_id = ?').run(req.user.id);
-  res.json({ message: 'Todas las notificaciones marcadas como leídas' });
+async function markAllRead(req, res) {
+  try {
+    await notificationModel.markAllAsRead(req.user.id);
+    res.json({ message: 'Todas las notificaciones marcadas como leídas' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 }
 
 module.exports = { getNotifications, markAsRead, markAllRead };

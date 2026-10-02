@@ -1,9 +1,9 @@
-const { getDb } = require('../database/db');
+const { getDb, transaction } = require('../database/db');
 
 const courseModel = {
-  getAll({ area, level } = {}) {
+  async getAll({ area, level } = {}) {
     const db = getDb();
-    let query = 'SELECT * FROM courses WHERE 1=1';
+    let query = 'SELECT * FROM courses WHERE active';
     const params = [];
     if (area) {
       query += ' AND area = ?';
@@ -13,32 +13,46 @@ const courseModel = {
       query += ' AND level = ?';
       params.push(level);
     }
-    query += ' ORDER BY created_at DESC';
+    query += ' ORDER BY students_count DESC';
     return db.prepare(query).all(...params);
   },
 
-  getById(id) {
+  async getById(id) {
     const db = getDb();
     return db.prepare('SELECT * FROM courses WHERE id = ?').get(id);
   },
 
-  enroll(userId, courseId) {
+  async getModules(courseId) {
     const db = getDb();
-    return db.prepare('INSERT OR IGNORE INTO course_enrollments (user_id, course_id) VALUES (?, ?)').run(userId, courseId);
+    return db.prepare('SELECT * FROM course_modules WHERE course_id = ? ORDER BY order_index').all(courseId);
   },
 
-  getEnrollments(userId) {
+  // Inscribe al estudiante y suma 1 al contador del curso solo si la inscripción es nueva
+  async enroll(studentId, courseId) {
+    return transaction(async (tx) => {
+      const inserted = await tx.prepare(`
+        INSERT INTO enrollments (student_id, course_id, progress) VALUES (?, ?, 0)
+        ON CONFLICT (student_id, course_id) DO NOTHING
+      `).run(studentId, courseId);
+      if (inserted.changes > 0) {
+        await tx.prepare('UPDATE courses SET students_count = students_count + 1 WHERE id = ?').run(courseId);
+      }
+      return inserted.changes > 0;
+    });
+  },
+
+  async getEnrollments(studentId) {
     const db = getDb();
     return db.prepare(`
-      SELECT ce.*, c.title, c.description, c.duration_hours, c.level, c.area, c.image_url, c.instructor
-      FROM course_enrollments ce
-      JOIN courses c ON ce.course_id = c.id
-      WHERE ce.user_id = ?
-      ORDER BY ce.enrolled_at DESC
-    `).all(userId);
+      SELECT e.*, c.title, c.description, c.duration_hours, c.level, c.area, c.instructor, c.image_url
+      FROM enrollments e
+      JOIN courses c ON e.course_id = c.id
+      WHERE e.student_id = ?
+      ORDER BY e.enrolled_at DESC
+    `).all(studentId);
   },
 
-  getCoursesByArea() {
+  async getCoursesByArea() {
     const db = getDb();
     return db.prepare('SELECT area, COUNT(*) as count FROM courses GROUP BY area').all();
   }

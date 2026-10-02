@@ -1,16 +1,17 @@
 const { getDb } = require('../database/db');
 
 const emailLogModel = {
-  create({ studentId, jobId, alertId, toEmail, subject, body }) {
+  async create({ studentId, jobId, alertId, toEmail, subject, body }) {
     const db = getDb();
-    const result = db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO email_log (student_id, job_id, alert_id, to_email, subject, body)
       VALUES (?, ?, ?, ?, ?, ?)
+      RETURNING id
     `).run(studentId, jobId || null, alertId || null, toEmail, subject, body);
     return result.lastInsertRowid;
   },
 
-  getAll(limit = 200) {
+  async getAll(limit = 200) {
     const db = getDb();
     return db.prepare(`
       SELECT el.*, j.title as job_title, s.full_name as student_name
@@ -22,9 +23,9 @@ const emailLogModel = {
     `).all(limit);
   },
 
-  countAll() {
+  async countAll() {
     const db = getDb();
-    return db.prepare('SELECT COUNT(*) as c FROM email_log').get().c;
+    return (await db.prepare('SELECT COUNT(*) as c FROM email_log').get()).c;
   }
 };
 

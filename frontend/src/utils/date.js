@@ -1,4 +1,4 @@
-// El backend (SQLite datetime('now')) guarda fechas como "YYYY-MM-DD HH:MM:SS" en UTC,
+// El backend (PostgreSQL, TIMESTAMP en UTC) entrega las fechas como "YYYY-MM-DD HH:MM:SS",
 // sin sufijo de zona horaria. `new Date(...)` interpreta ese formato como hora LOCAL,
 // no UTC, así que sin este ajuste los tiempos relativos quedan desfasados
 // (a veces incluso "en el futuro") según la zona horaria del navegador.

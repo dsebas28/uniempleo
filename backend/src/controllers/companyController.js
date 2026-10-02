@@ -1,110 +1,110 @@
 const companyService = require('../services/companyService');
 const applicationService = require('../services/applicationService');
 
-function getCompanyProfile(req, res) {
+async function getCompanyProfile(req, res) {
   try {
-    const profile = companyService.getProfile(req.user.id);
+    const profile = await companyService.getProfile(req.user.id);
     res.json(profile);
   } catch (err) {
     res.status(404).json({ error: err.message });
   }
 }
 
-function updateCompanyProfile(req, res) {
+async function updateCompanyProfile(req, res) {
   try {
-    const updated = companyService.updateProfile(req.user.id, req.body);
+    const updated = await companyService.updateProfile(req.user.id, req.body);
     res.json({ message: 'Perfil actualizado correctamente', profile: updated });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function getDashboard(req, res) {
+async function getDashboard(req, res) {
   try {
-    const dashboard = companyService.getDashboard(req.user.id);
+    const dashboard = await companyService.getDashboard(req.user.id);
     res.json(dashboard);
   } catch (err) {
     res.status(404).json({ error: err.message });
   }
 }
 
-function getCompanyJobs(req, res) {
+async function getCompanyJobs(req, res) {
   try {
-    const jobs = companyService.getCompanyJobs(req.user.id);
+    const jobs = await companyService.getCompanyJobs(req.user.id);
     res.json(jobs);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function createJob(req, res) {
+async function createJob(req, res) {
   try {
-    const result = companyService.createJob(req.user.id, req.body);
+    const result = await companyService.createJob(req.user.id, req.body);
     res.status(201).json(result);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function updateJob(req, res) {
+async function updateJob(req, res) {
   try {
-    const result = companyService.updateJob(req.user.id, req.params.id, req.body);
+    const result = await companyService.updateJob(req.user.id, req.params.id, req.body);
     res.json(result);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function deleteJob(req, res) {
+async function deleteJob(req, res) {
   try {
-    const result = companyService.deleteJob(req.user.id, req.params.id);
+    const result = await companyService.deleteJob(req.user.id, req.params.id);
     res.json(result);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function getCandidates(req, res) {
+async function getCandidates(req, res) {
   try {
-    const candidates = applicationService.getCompanyCandidates(req.user.id, req.query.jobId);
+    const candidates = await applicationService.getCompanyCandidates(req.user.id, req.query.jobId);
     res.json(candidates);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function updateCandidateStatus(req, res) {
+async function updateCandidateStatus(req, res) {
   try {
     const { status, message } = req.body;
-    const result = applicationService.updateCandidateStatus(req.user.id, req.params.applicationId, status, message);
+    const result = await applicationService.updateCandidateStatus(req.user.id, req.params.applicationId, status, message);
     res.json(result);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function sendCandidateMessage(req, res) {
+async function sendCandidateMessage(req, res) {
   try {
     const { message } = req.body;
-    const result = applicationService.sendMessageToCandidate(req.user.id, req.params.applicationId, message);
+    const result = await applicationService.sendMessageToCandidate(req.user.id, req.params.applicationId, message);
     res.json(result);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
 
-function getAllCompanies(req, res) {
+async function getAllCompanies(req, res) {
   try {
-    const companies = companyService.getAllApproved();
+    const companies = await companyService.getAllApproved();
     res.json(companies);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 }
 
-function getCompanyById(req, res) {
+async function getCompanyById(req, res) {
   try {
-    const company = companyService.getById(req.params.id);
+    const company = await companyService.getById(req.params.id);
     res.json(company);
   } catch (err) {
     res.status(404).json({ error: err.message });

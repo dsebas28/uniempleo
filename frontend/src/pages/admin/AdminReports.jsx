@@ -55,7 +55,7 @@ export default function AdminReports() {
   }
 
   const modalityData = (reports.jobsByModality || []).map(m => ({
-    name: m.modality === 'remoto' ? 'Remoto' : m.modality === 'hibrido' ? 'Híbrido' : 'Presencial',
+    name: m.modality, // la base guarda 'Remoto', 'Híbrido' o 'Presencial' (CHECK en jobs.modality)
     value: m.count
   }));
 

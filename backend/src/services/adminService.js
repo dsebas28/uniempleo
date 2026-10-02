@@ -7,19 +7,22 @@ const emailLogModel = require('../models/emailLogModel');
 const { getDb } = require('../database/db');
 
 const adminService = {
-  getDashboard() {
-    const students = userModel.countByRole('student');
-    const companies = userModel.countByRole('company');
-    const jobs = jobModel.getAllAdmin().length;
-    const activeJobs = jobModel.getAllAdmin().filter(j => j.status === 'active').length;
-    const applications = applicationModel.getTotalCount();
-    const hired = applicationModel.getHiredCount();
-
-    const recentUsers = userModel.getRecent(10);
-    const jobsByArea = jobModel.getJobsByArea(8);
-    const jobsByCity = jobModel.getJobsByCity(8);
-    const appsByStatus = applicationModel.countByStatus();
-    const jobsByModality = jobModel.getJobsByModality();
+  async getDashboard() {
+    // Consultas independientes: se lanzan en paralelo
+    const [students, companies, allJobs, applications, hired, recentUsers, jobsByArea, jobsByCity, appsByStatus, jobsByModality] = await Promise.all([
+      userModel.countByRole('student'),
+      userModel.countByRole('company'),
+      jobModel.getAllAdmin(),
+      applicationModel.getTotalCount(),
+      applicationModel.getHiredCount(),
+      userModel.getRecent(10),
+      jobModel.getJobsByArea(8),
+      jobModel.getJobsByCity(8),
+      applicationModel.countByStatus(),
+      jobModel.getJobsByModality(),
+    ]);
+    const jobs = allJobs.length;
+    const activeJobs = allJobs.filter(j => j.status === 'active').length;
 
     return {
       kpis: { students, companies, jobs, activeJobs, applications, hired },
@@ -31,47 +34,47 @@ const adminService = {
     };
   },
 
-  getUsers(params) {
-    return userModel.getAll(params);
+  async getUsers(params) {
+    return await userModel.getAll(params);
   },
 
-  updateUserStatus(userId, active) {
-    userModel.setActive(userId, active);
+  async updateUserStatus(userId, active) {
+    await userModel.setActive(userId, active);
     return { message: 'Estado del usuario actualizado exitosamente' };
   },
 
-  getCompanies() {
-    return companyModel.getAllAdmin();
+  async getCompanies() {
+    return await companyModel.getAllAdmin();
   },
 
-  approveCompany(companyId, approved) {
-    companyModel.setApproved(companyId, approved);
+  async approveCompany(companyId, approved) {
+    await companyModel.setApproved(companyId, approved);
     return { message: approved ? 'Empresa verificada exitosamente' : 'Verificación de empresa revocada' };
   },
 
-  getJobs() {
-    return jobModel.getAllAdmin();
+  async getJobs() {
+    return await jobModel.getAllAdmin();
   },
 
-  updateJobStatus(jobId, status) {
-    jobModel.updateStatus(jobId, status);
+  async updateJobStatus(jobId, status) {
+    await jobModel.updateStatus(jobId, status);
     return { message: 'Estado de la vacante actualizado' };
   },
 
-  getReports() {
+  async getReports() {
     const db = getDb();
-    const jobsByArea = jobModel.getJobsByArea(15);
-    const jobsByCity = jobModel.getJobsByCity(10);
-    const jobsByModality = jobModel.getJobsByModality();
-    const appsByStatus = applicationModel.countByStatus();
-    const coursesByArea = courseModel.getCoursesByArea();
-    const userGrowth = db.prepare(`SELECT strftime('%Y-%m', created_at) as month, role, COUNT(*) as count FROM users GROUP BY month, role ORDER BY month`).all();
+    const jobsByArea = await jobModel.getJobsByArea(15);
+    const jobsByCity = await jobModel.getJobsByCity(10);
+    const jobsByModality = await jobModel.getJobsByModality();
+    const appsByStatus = await applicationModel.countByStatus();
+    const coursesByArea = await courseModel.getCoursesByArea();
+    const userGrowth = await db.prepare(`SELECT to_char(created_at, 'YYYY-MM') as month, role, COUNT(*) as count FROM users GROUP BY month, role ORDER BY month`).all();
 
     return { jobsByArea, jobsByCity, jobsByModality, appsByStatus, coursesByArea, userGrowth };
   },
 
-  getEmailLog() {
-    return { emails: emailLogModel.getAll(), total: emailLogModel.countAll() };
+  async getEmailLog() {
+    return { emails: await emailLogModel.getAll(), total: await emailLogModel.countAll() };
   }
 };
 

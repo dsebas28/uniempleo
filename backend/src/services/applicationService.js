@@ -6,27 +6,27 @@ const notificationModel = require('../models/notificationModel');
 
 const applicationService = {
   async applyToJob(userId, jobId, { coverLetter } = {}) {
-    const student = studentModel.findByUserId(userId);
+    const student = await studentModel.findByUserId(userId);
     if (!student) {
       throw new Error('Debes completar tu perfil de estudiante antes de postularte');
     }
 
-    const job = jobModel.getById(jobId);
+    const job = await jobModel.getById(jobId);
     if (!job || job.status !== 'active') {
       throw new Error('La oferta laboral no se encuentra activa');
     }
 
-    if (applicationModel.hasApplied(jobId, student.id)) {
+    if (await applicationModel.hasApplied(jobId, student.id)) {
       throw new Error('Ya te has postulado a esta vacante anteriormente');
     }
 
-    const appId = applicationModel.create(jobId, student.id, coverLetter);
-    jobModel.incrementApplicants(jobId);
+    const appId = await applicationModel.create(jobId, student.id, coverLetter);
+    await jobModel.incrementApplicants(jobId);
 
     // Notify company
-    const company = companyModel.findById(job.company_id);
+    const company = await companyModel.findById(job.company_id);
     if (company) {
-      notificationModel.create(
+      await notificationModel.create(
         company.user_id,
         'Nueva postulación recibida',
         `${student.full_name} se ha postulado a tu vacante "${job.title}"`,
@@ -38,23 +38,23 @@ const applicationService = {
     return { id: appId, message: '¡Postulación enviada exitosamente!' };
   },
 
-  getStudentApplications(userId) {
-    const student = studentModel.findByUserId(userId);
+  async getStudentApplications(userId) {
+    const student = await studentModel.findByUserId(userId);
     if (!student) throw new Error('Perfil de estudiante no encontrado');
-    return applicationModel.findByStudentId(student.id);
+    return await applicationModel.findByStudentId(student.id);
   },
 
-  getCompanyCandidates(userId, jobId = null) {
-    const company = companyModel.findByUserId(userId);
+  async getCompanyCandidates(userId, jobId = null) {
+    const company = await companyModel.findByUserId(userId);
     if (!company) throw new Error('Empresa no encontrada');
-    return applicationModel.findByCompanyId(company.id, jobId);
+    return await applicationModel.findByCompanyId(company.id, jobId);
   },
 
-  updateCandidateStatus(userId, applicationId, status, customMessage = '') {
-    const company = companyModel.findByUserId(userId);
+  async updateCandidateStatus(userId, applicationId, status, customMessage = '') {
+    const company = await companyModel.findByUserId(userId);
     if (!company) throw new Error('Empresa no encontrada');
 
-    const app = applicationModel.findByIdAndCompany(applicationId, company.id);
+    const app = await applicationModel.findByIdAndCompany(applicationId, company.id);
     if (!app) throw new Error('Postulación no encontrada o no autorizada');
 
     const validStatuses = ['sent', 'reviewing', 'preselected', 'interview', 'selected', 'rejected'];
@@ -62,10 +62,10 @@ const applicationService = {
       throw new Error('Estado de postulación inválido');
     }
 
-    applicationModel.updateStatus(applicationId, status);
+    await applicationModel.updateStatus(applicationId, status);
 
     // Dispatch status notification to student
-    const student = studentModel.findById(app.student_id);
+    const student = await studentModel.findById(app.student_id);
     if (student) {
       const statusMessages = {
         reviewing: `${company.name} ha comenzado a revisar tu postulación para "${app.job_title}"`,
@@ -79,7 +79,7 @@ const applicationService = {
         const notifType = (status === 'selected' || status === 'preselected' || status === 'interview') ? 'success' : 'info';
         const clean = (customMessage || '').trim();
         const fullMessage = clean ? `${statusMessages[status]} ${clean}` : statusMessages[status];
-        notificationModel.create(
+        await notificationModel.create(
           student.user_id,
           'Actualización de tu postulación',
           fullMessage,
@@ -93,20 +93,20 @@ const applicationService = {
   },
 
   // Mensaje libre de la empresa hacia un candidato puntual (no cambia el estado)
-  sendMessageToCandidate(userId, applicationId, message) {
-    const company = companyModel.findByUserId(userId);
+  async sendMessageToCandidate(userId, applicationId, message) {
+    const company = await companyModel.findByUserId(userId);
     if (!company) throw new Error('Empresa no encontrada');
 
     const clean = (message || '').trim();
     if (!clean) throw new Error('El mensaje no puede estar vacío');
 
-    const app = applicationModel.findByIdAndCompany(applicationId, company.id);
+    const app = await applicationModel.findByIdAndCompany(applicationId, company.id);
     if (!app) throw new Error('Postulación no encontrada o no autorizada');
 
-    const student = studentModel.findById(app.student_id);
+    const student = await studentModel.findById(app.student_id);
     if (!student) throw new Error('Estudiante no encontrado');
 
-    notificationModel.create(
+    await notificationModel.create(
       student.user_id,
       `Mensaje de ${company.name}`,
       `Sobre tu postulación a "${app.job_title}": ${clean}`,

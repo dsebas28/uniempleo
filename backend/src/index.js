@@ -41,7 +41,7 @@ app.use((err, req, res, next) => {
 // Initialize DB and start server
 async function start() {
   try {
-    initializeDatabase();
+    await initializeDatabase();
     await seedDatabase();
     app.listen(PORT, () => {
       console.log(`\n🚀 UniEmpleo Backend corriendo en http://localhost:${PORT}`);

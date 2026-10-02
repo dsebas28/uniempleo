@@ -1,32 +1,38 @@
 const { getDb } = require('../database/db');
 
 const notificationModel = {
-  create(userId, title, message, type = 'info', link = null) {
+  async create(userId, title, message, type = 'info', link = null) {
     const db = getDb();
-    const result = db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO notifications (user_id, title, message, type, link)
       VALUES (?, ?, ?, ?, ?)
+      RETURNING id
     `).run(userId, title, message, type, link);
     return result.lastInsertRowid;
   },
 
-  getByUserId(userId) {
+  async getByUserId(userId, limit = 30) {
     const db = getDb();
     return db.prepare(`
-      SELECT * FROM notifications 
-      WHERE user_id = ? 
-      ORDER BY created_at DESC LIMIT 50
-    `).all(userId);
+      SELECT * FROM notifications
+      WHERE user_id = ?
+      ORDER BY created_at DESC LIMIT ?
+    `).all(userId, limit);
   },
 
-  markAsRead(id, userId) {
+  async countUnread(userId) {
     const db = getDb();
-    return db.prepare('UPDATE notifications SET read = 1 WHERE id = ? AND user_id = ?').run(id, userId);
+    return (await db.prepare('SELECT COUNT(*) as c FROM notifications WHERE user_id = ? AND NOT read').get(userId)).c;
   },
 
-  markAllAsRead(userId) {
+  async markAsRead(id, userId) {
     const db = getDb();
-    return db.prepare('UPDATE notifications SET read = 1 WHERE user_id = ?').run(userId);
+    return db.prepare('UPDATE notifications SET read = TRUE WHERE id = ? AND user_id = ?').run(id, userId);
+  },
+
+  async markAllAsRead(userId) {
+    const db = getDb();
+    return db.prepare('UPDATE notifications SET read = TRUE WHERE user_id = ?').run(userId);
   }
 };
 
